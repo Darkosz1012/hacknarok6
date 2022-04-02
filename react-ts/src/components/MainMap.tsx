@@ -10,12 +10,21 @@ import PushPinTwoToneIcon from '@mui/icons-material/PushPinTwoTone';
 import pinIcon from '../resources/pinIcon2.svg';
 import { Fab, Box } from '@mui/material';
 
-function AddButton() {
+function AddButton(props: any) {
   const [active, setActive] = useState(false);
+
+  const map = useMap();
 
   const handleAdd = () => {
     setActive(false);
-    // TODO
+
+    const location = map.getCenter();
+    // SZYMON TUTAJ :OOOO
+    console.log(location);
+  };
+
+  const handleMoveToUser = () => {
+    
   };
 
   return (
@@ -31,42 +40,48 @@ function AddButton() {
       {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd())}>
         {active && <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>}
       </Fab>}
+        {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => {
+          handleAdd();
+          handleMoveToUser();
+        })}>
+        {active && <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>}
+      </Fab>}
       </Box>
       {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex:'1000'}}></PushPinTwoToneIcon>}
     </Box>
   )
 }
 
-function UserMarker() {
+function UserMarker(props: any) {
     const userIcon = new Icon({
         iconUrl: pinIcon,
         iconSize: new Point(40, 40),  
       });
-    
-    const [position, setPosition] = useState<LatLng | undefined>();
 
     const map = useMap();
 
     useEffect(() => {
       map.locate().on("locationfound", function (e) {
-        setPosition(e.latlng);
+        props.setPosition(e.latlng);
         map.flyTo(e.latlng, 15);
       });
     }, [map]);
 
-    return !position ? null :(
-        <Marker position={position} icon={userIcon}></Marker>
+    return !props.position ? null :(
+        <Marker position={props.position} icon={userIcon}></Marker>
     );
 }
 
 function MainMap(props: any) {
+  const [position, setPosition] = useState<LatLng | undefined>();
+  
     return (
         <MapContainer style={{height: "calc(100vh - 4rem)", marginTop:"4rem"}} center={[52.1064618,18.5525723]} zoom={7}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-        <UserMarker />
+        <UserMarker position={position} setPosition={setPosition}/>
           <AddButton></AddButton>
         </MapContainer>
     );                                                                                                          
