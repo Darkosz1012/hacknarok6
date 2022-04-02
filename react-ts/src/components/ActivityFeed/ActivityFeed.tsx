@@ -75,7 +75,7 @@ export default function ActivityFeed() {
     const handleTagClick = (tag: string) => toggleTag(tag);
 
     return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ padding: "2rem" }}>
             <Grid item container spacing={3}>
                 <Grid item xs>
                     <SearchBarTags
