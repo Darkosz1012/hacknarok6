@@ -179,10 +179,7 @@ function DashboardContent() {
                         <Divider />
                         <List component="nav">
                             <ListItem>
-                                <ListItemButton
-                                    component={RouterLink}
-                                    to="/map"
-                                >
+                                <ListItemButton component={RouterLink} to="/">
                                     <ListItemIcon>
                                         <LogoutIcon />
                                     </ListItemIcon>
@@ -223,12 +220,12 @@ function DashboardContent() {
                         }}
                     >
                         <Box maxWidth="lg" sx={{ marginTop: "4rem" }}>
-                            <Route exact path="/map" component={MainMap} />
                             <Route
                                 exact
                                 path="/nearby"
                                 component={ActivityFeed}
                             />
+                            <Route path="/" component={MainMap} />
                         </Box>
                     </Box>
                 </Box>

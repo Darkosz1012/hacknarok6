@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken'
 
 export default function (ogm, driver) {
   const User = ogm.model('User')
+  const Post = ogm.model('Post')
+  const Tag = ogm.model('Tag')
+  console.log(createJWT({username:"test", userId:"8a4fac1a-aef9-44fb-a8d5-3ff57570ceb4", email:"test@test.test"}, "60h"))
   return {
     Mutation: {
       signUp: async (_source, { email, username, password }) => {
@@ -67,6 +70,79 @@ export default function (ogm, driver) {
         var data = jwt.decode(refreshToken)
         return createUserTokenWithoutRefresh(data, refreshToken)
       },
+      createPost: async (_source, { title, content, coords, tags, place }, context) => {
+        var input =  {
+          title,
+          content,
+          coords,
+          createdBy: {
+            connect: { where: { node: { userId: context.jwt.sub } } },
+          },
+        }
+        if(place){
+          input.place = {
+            "connect": {
+              "place": {
+                "where": {
+                  "node": {
+                    "placeId": place
+                  }
+                }
+              }
+            }
+          }
+        }
+        let post = await Post.create({
+          input 
+        })
+        console.log("tags", tags)
+        for(var name of tags){
+          console.log(name)
+          let tag = await Tag.find({
+            where: {
+              name: name,
+            },
+          })
+          console.log("tag ", tag)
+          if(tag.length == 0 )
+            await await Tag.create({
+              input:{name: name}
+            })
+          await Post.update({
+            "where": { "postId": post.posts[0].postId },
+            "update": {
+              "tags": {
+                  'connect': {
+                    "where": { "node": { "name": name } }
+                  }
+                }
+            },
+          })
+    
+        }
+        console.log("post" ,post,post.posts[0].postId)
+        
+        let selectionSet =`
+        {
+          postId
+          title
+          coords{
+            latitude
+            longitude
+          }
+          updatedAt
+          createdAt
+        }
+        `
+        // post = await Post.find({
+        //   where: {
+        //     "postId": post.posts[0].postId 
+        //   },
+        //   selectionSet
+        // })
+        // console.log(post)
+        return {"success":true}
+      },
     },
   }
 }
@@ -97,4 +173,5 @@ function createJWT(user, time) {
     { expiresIn: time }
   )
 }
+
 
