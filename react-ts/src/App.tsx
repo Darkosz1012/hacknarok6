@@ -2,8 +2,8 @@ import React from "react";
 import "./App.css";
 import Dashboard from "./components/Dashboard";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
-import SignIn from "./components/SignIn";
-import SignUp from "./components/SignUp";
+import SignInPanel from "./components/SignInPanel";
+import SignUpPanel from "./components/SignUpPanel";
 import { PrivateRoute } from "react-auth-kit";
 
 function App() {
@@ -17,8 +17,8 @@ function App() {
                     exact
                 />
                 {/* <Route exact path="/" component={Dashboard} /> */}
-                <Route exact path="/signin" component={SignIn} />
-                <Route exact path="/signup" component={SignUp} />
+                <Route exact path="/signin" component={SignInPanel} />
+                <Route exact path="/signup" component={SignUpPanel} />
             </Switch>
         </Router>
     );

@@ -9,49 +9,53 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Post from "./Post";
 import SearchBarTags from "../searchBarTags/SearchBarTags";
-
+import { PostType } from "../../types/PostType";
+import { useQuery, gql } from "@apollo/client";
+import { GET_POSTS_QUERY } from "../../queries/posts";
+type postsProps = {
+    posts: PostType[];
+};
 export default function ActivityFeed() {
-    const posts = [
-        {
-            title: "Post 1",
-            body: "This is the first post",
-            author: "John Doe",
-            date: new Date(),
-            tags: ["tag1", "tag2"],
-        },
-        {
-            title: "Post 2",
-            body: "This is the second post",
-            author: "Jane Doe",
-            date: new Date(),
-            tags: ["tag1", "tag2"],
-        },
-        {
-            title: "Post 3",
-            body: "This is the third post",
-            author: "John Doe",
-            date: new Date(),
-            tags: ["tag1", "tag2"],
-        },
-        {
-            title: "Post 4",
-            body: "This is the fourth post",
-            author: "Jane Doe",
-            date: new Date(),
-            tags: ["tag1", "tag2"],
-        },
-        {
-            title: "Post 5",
-            body: "This is the fifth post",
-            author: "Szymon Kania",
-            date: new Date(),
-            tags: ["tag1", "tag2"],
-        },
-    ];
-    const [sort, setSort] = React.useState("1");
+    const POSTS_PER_PAGE = 1;
     const [page, setPage] = React.useState(1);
-    const [count, setCount] = React.useState(10);
     const [tags, setTags] = React.useState<string[]>([]);
+    const [posts, setPosts] = React.useState<any[]>([]);
+    const { loading, error } = useQuery(GET_POSTS_QUERY, {
+        variables: {
+            options: {
+                limit: POSTS_PER_PAGE,
+                offset: (page - 1) * POSTS_PER_PAGE,
+            },
+            where: {
+                tags_SOME: {
+                    ...(tags.length
+                        ? {
+                              name_IN: tags,
+                          }
+                        : { name_NOT_IN: tags }),
+                },
+
+                ...tags.reduce((acc, curr) => {
+                    return {
+                        OR: [
+                            {
+                                title_CONTAINS: curr,
+                                OR: [acc],
+                            },
+                        ],
+                    };
+                }, {}),
+            },
+        },
+
+        onCompleted: (data) => {
+            console.log(data);
+            setPosts(data.posts);
+            setCount(data.postsAggregate.count);
+        },
+    });
+    const [count, setCount] = React.useState(10);
+    const [sort, setSort] = React.useState("1");
 
     const handleChange = (event: SelectChangeEvent) =>
         setSort(event.target.value as string);
@@ -67,9 +71,11 @@ export default function ActivityFeed() {
         } else {
             setTags([...tags, tag]);
         }
+        setPage(1);
     };
     const handleSearchChange = (value: string[] | null) => {
         setTags(value ?? []);
+        setPage(1);
     };
 
     const handleTagClick = (tag: string) => toggleTag(tag);
@@ -106,13 +112,15 @@ export default function ActivityFeed() {
                 </Grid>
             </Grid>
             <Grid item container spacing={3}>
-                {posts.map((post) => (
-                    <Post
-                        key={post.title}
-                        {...post}
-                        onChipClick={handleTagClick}
-                    />
-                ))}
+                {!loading &&
+                    !error &&
+                    posts.map((post, index) => (
+                        <Post
+                            key={index}
+                            {...post}
+                            onChipClick={handleTagClick}
+                        />
+                    ))}
             </Grid>
             <Grid
                 item

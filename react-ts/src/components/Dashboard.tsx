@@ -225,7 +225,7 @@ function DashboardContent() {
                                 path="/nearby"
                                 component={ActivityFeed}
                             />
-                            <Route path="/" component={MainMap} />
+                            <Route exact path="/" component={MainMap} />
                         </Box>
                     </Box>
                 </Box>
