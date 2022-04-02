@@ -17,6 +17,11 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
+import SendIcon from "@mui/icons-material/Send";
+import BaseActivityFeed from "./ActivityFeed/ActivityFeed";
 
 function Copyright(props: any) {
     return (
@@ -86,6 +91,10 @@ const Drawer = styled(MuiDrawer, {
     },
 }));
 
+const ActivityFeed = styled(BaseActivityFeed)({
+    backgroundColor: "#f00",
+});
+
 const mdTheme = createTheme();
 
 function DashboardContent() {
@@ -146,7 +155,14 @@ function DashboardContent() {
                         </IconButton>
                     </Toolbar>
                     <Divider />
-                    <List component="nav"></List>
+                    <List component="nav">
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <SendIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Nearby activities" />
+                        </ListItemButton>
+                    </List>
                 </Drawer>
                 <Box
                     component="main"
@@ -162,41 +178,7 @@ function DashboardContent() {
                 >
                     <Toolbar />
                     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                        <Grid container spacing={3}>
-                            {/* Chart */}
-                            <Grid item xs={12} md={8} lg={9}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        height: 240,
-                                    }}
-                                ></Paper>
-                            </Grid>
-                            {/* Recent Deposits */}
-                            <Grid item xs={12} md={4} lg={3}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        height: 240,
-                                    }}
-                                ></Paper>
-                            </Grid>
-                            {/* Recent Orders */}
-                            <Grid item xs={12}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    }}
-                                ></Paper>
-                            </Grid>
-                        </Grid>
-                        <Copyright sx={{ pt: 4 }} />
+                        <ActivityFeed />
                     </Container>
                 </Box>
             </Box>
