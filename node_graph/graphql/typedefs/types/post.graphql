@@ -15,4 +15,5 @@ type Post{
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
     coords: Point!
+    img: String
 }

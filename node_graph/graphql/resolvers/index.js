@@ -70,7 +70,7 @@ export default function (ogm, driver) {
         var data = jwt.decode(refreshToken)
         return createUserTokenWithoutRefresh(data, refreshToken)
       },
-      createPost: async (_source, { title, content, coords, tags, place }, context) => {
+      createPost: async (_source, { title, content, coords, tags, place,img }, context) => {
         var input =  {
           title,
           content,
@@ -78,6 +78,9 @@ export default function (ogm, driver) {
           createdBy: {
             connect: { where: { node: { userId: context.jwt.sub } } },
           },
+        }
+        if(img){
+          input.img = img
         }
         if(place){
           input.place = {

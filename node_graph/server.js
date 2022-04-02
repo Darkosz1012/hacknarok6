@@ -23,7 +23,7 @@ dotenv.config()
     const storage = multer.diskStorage({
         destination: "./public/uploads/",
         filename: function (req, file, cb) {
-            cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+            cb(null, req.body.name + path.extname(file.originalname));
         }
     });
 
