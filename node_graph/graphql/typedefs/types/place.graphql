@@ -1,6 +1,6 @@
 type Place{
-    tagId: ID! @id(autogenerate: true, unique: true)
-    name: String!
+    placeId: ID! @id(autogenerate: true, unique: true)
+    name: String! @unique
     description: String
     visible: Boolean! 
     createdAt: DateTime! @timestamp(operations: [CREATE])

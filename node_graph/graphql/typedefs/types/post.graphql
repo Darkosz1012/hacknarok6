@@ -1,6 +1,6 @@
 type Post{
     postId: ID! @id(autogenerate: true, unique: true)
-    title: String
+    title: String 
     content: String
     likedBy: [User!]!
         @relationship(type: "LIKED", properties: "ITime", direction: IN)
