@@ -9,6 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Post from "./Post";
 import SearchBarTags from "../searchBarTags/SearchBarTags";
+import Container from "@material-ui/core/Container";
 
 export default function ActivityFeed() {
     const posts = [
@@ -75,7 +76,7 @@ export default function ActivityFeed() {
     const handleTagClick = (tag: string) => toggleTag(tag);
 
     return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ padding: "2rem" }}>
             <Grid item container spacing={3}>
                 <Grid item xs>
                     <SearchBarTags
