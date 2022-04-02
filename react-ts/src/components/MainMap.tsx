@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import PushPinTwoToneIcon from '@mui/icons-material/PushPinTwoTone';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import pinIcon from '../resources/pinIcon2.svg';
 import { Fab, Box } from '@mui/material';
 
@@ -24,12 +25,12 @@ function AddButton(props: any) {
   };
 
   const handleMoveToUser = () => {
-    
+    map.flyTo(props.position, 15);
   };
 
   return (
     <Box>
-    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display:'flex', flexDirection:'column-reverse', justifyContent: 'space-between', height:'11rem'}}>
+    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display:'flex', flexDirection:'column-reverse', justifyContent: 'space-between', height:'17rem'}}>
       <Fab sx={{ width: '5rem', height: '5rem' }} color={active ? 'error' : 'primary'} onClick={(e => {
         e.stopPropagation();
         setActive(!active);
@@ -38,13 +39,13 @@ function AddButton(props: any) {
         {active && <CloseIcon sx={{width:'50%', height:'50%'}}></CloseIcon>}
       </Fab>
       {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd())}>
-        {active && <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>}
+        <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>
       </Fab>}
         {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => {
-          handleAdd();
           handleMoveToUser();
+          handleAdd();
         })}>
-        {active && <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>}
+        <GpsFixedIcon sx={{width:'50%', height:'50%'}}></GpsFixedIcon>
       </Fab>}
       </Box>
       {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex:'1000'}}></PushPinTwoToneIcon>}
@@ -82,7 +83,7 @@ function MainMap(props: any) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
         <UserMarker position={position} setPosition={setPosition}/>
-          <AddButton></AddButton>
+          <AddButton position={position}></AddButton>
         </MapContainer>
     );                                                                                                          
 }   
