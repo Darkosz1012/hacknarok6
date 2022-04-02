@@ -12,13 +12,14 @@
     "@mui/icons-material": "^5.2.4",
     "@mui/material": "^5.2.4",
     "@mui/styled-engine-sc": "^5.1.0",
+    "@types/react-router": "^5.1.18",
     "classnames": "^2.2.6",
     "graphql": "^14.5.8",
     "leaflet": "^1.7.1",
     "moment": "^2.29.1",
     "neo4j-driver-core": "^4.4.1",
     "react": "^17.0.1",
-    "react-auth-kit": "^1.6.5",
+    "react-auth-kit": "^1.6.13",
     "react-dom": "^17.0.1",
     "react-leaflet": "^3.2.5",
     "react-router": "^5.1.2",
@@ -51,6 +52,7 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.7.9",
-    "@types/react-dom": "^17.0.14"
+    "@types/react-dom": "^17.0.14",
+    "@types/react-router-dom": "^5.3.3"
   }
 }

@@ -1,20 +1,40 @@
 import * as React from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiDrawer from "@mui/material/Drawer";
-import Box from "@mui/material/Box";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
+import { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Badge from "@mui/material/Badge";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MainMap from './MainMap'
+
+import {
+    CssBaseline,
+    Drawer as MuiDrawer,
+    Box,
+    AppBar as MuiAppBar,
+    Toolbar,
+    List,
+    Typography,
+    Divider,
+    IconButton,
+    Container,
+    ListItem,
+    ListItemText,
+    ListItemIcon,
+  } from '@mui/material'
+
+  import {
+    
+    Home as HomeIcon,
+    GroupAdd as GroupAddIcon,
+    AccountCircle as AccountCircleIcon,
+    ConnectWithoutContact as ConnectWithoutContactIcon,
+  } from '@mui/icons-material'
+  import LogoutIcon from '@mui/icons-material/Logout';
+import { useSignOut } from "react-auth-kit";
 
 function Copyright(props: any) {
     return (
@@ -88,6 +108,7 @@ const mdTheme = createTheme();
 
 function DashboardContent() {
     const [open, setOpen] = React.useState(true);
+    const signOut = useSignOut()
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -144,7 +165,16 @@ function DashboardContent() {
                         </IconButton>
                     </Toolbar>
                     <Divider />
-                    <List component="nav"></List>
+                    <List component="nav">
+                        <Link color="primary" onClick={() => signOut()} href="#">
+                            <ListItem button>
+                            <ListItemIcon>
+                                <LogoutIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Logout" />
+                            </ListItem>
+                        </Link>
+                    </List>
                 </Drawer>
                 <Box
                     component="main"
