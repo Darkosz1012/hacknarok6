@@ -25,6 +25,7 @@ const GET_TAGS = gql`
     }
 
     places(where: $where) {
+      placeId
       name
       coords {
         longitude
@@ -39,6 +40,7 @@ export interface PostData {
   content: string;
   tags: string[];
   location: LatLng;
+  place?: string;
 }
 interface PostFormProps {
   onSubmit?: (data: PostData) => void;
@@ -63,7 +65,7 @@ export default function PostForm(props: PostFormProps) {
             longitude: props.currentLocation?.lng,
             latitude: props.currentLocation?.lat,
           },
-          distance: 1000,
+          distance: 5000000000000,
         },
       },
     },
@@ -95,19 +97,33 @@ export default function PostForm(props: PostFormProps) {
               {props.currentLocation?.lng}
             </em>
           </MenuItem>
-          {data?.places?.map((location: any) => {
-            return (
-              <MenuItem
-                key={location.name}
-                value={JSON.stringify(location.position)}
-              >
-                <em>
-                  {location.name} - lat: {location.position.lat}, lng:
-                  {location.position.lng}
-                </em>
-              </MenuItem>
-            );
-          })}
+          {data?.places
+            ?.map((location: any) => {
+              return {
+                name: location.name,
+                position: {
+                  lng: location.coords.longitude,
+                  lat: location.coords.latitude,
+                },
+                placeId: location.placeId,
+              };
+            })
+            .map((location: any) => {
+              return (
+                <MenuItem
+                  key={location.name}
+                  value={JSON.stringify({
+                    ...location.position,
+                    place: location.placeId,
+                  })}
+                >
+                  <em>
+                    {location.name} - lat: {location.position?.lat}, lng:
+                    {location.position?.lng}
+                  </em>
+                </MenuItem>
+              );
+            })}
         </Select>
 
         <Typography gutterBottom variant="h6" component="div">
@@ -165,6 +181,7 @@ export default function PostForm(props: PostFormProps) {
               content,
               tags,
               location: newLocation,
+              place: parsed.place ?? null,
             });
           }}
         >

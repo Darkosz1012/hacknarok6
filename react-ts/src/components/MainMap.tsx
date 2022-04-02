@@ -171,6 +171,7 @@ function MainMap(props: any) {
           latitude: data.location.lat,
         },
         tags: data.tags,
+        place: data.place,
       },
     });
   };
