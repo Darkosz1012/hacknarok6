@@ -1,5 +1,11 @@
+type Message{
+  success: Boolean!
+}
+
 type Mutation {
   signIn(usernameOrEmail: String!, password: String!): Token!
   signUp(username: String!, email: String!, password: String!): Token!
   refreshToken(refreshToken: String!): Token!
+
+  createPost(title: String!, content: String!, coords: PointInput!, tags: [String!], place:String ): Message
 }

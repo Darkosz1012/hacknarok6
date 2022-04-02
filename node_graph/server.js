@@ -4,7 +4,7 @@ import neo4j from "neo4j-driver"
 import dotenv from 'dotenv'
 import OGM from '@neo4j/graphql-ogm'
 import schemaql from "./graphql/schema.js";
-
+import graphqlPluginAuth from "@neo4j/graphql-plugin-auth";
 
 dotenv.config()
 
@@ -23,13 +23,18 @@ dotenv.config()
         typeDefs: schemaql.typeDefs,
         driver,
         resolvers : schemaql.resolvers(ogm, driver),
+        plugins: {
+            auth: new graphqlPluginAuth.Neo4jGraphQLAuthJWTPlugin({
+                secret: process.env.GRAPHQL_SERVER_SECRET || '123456',
+            })
+        },
         config: {
-        jwt: {
-            secret: process.env.GRAPHQL_SERVER_SECRET || '123456',
-        },
-        auth: {
-            isAuthenticated: true,
-        },
+            jwt: {
+                secret: process.env.GRAPHQL_SERVER_SECRET || '123456',
+            },
+            auth: {
+                isAuthenticated: true,
+            },
         },
     })
 
@@ -43,7 +48,7 @@ dotenv.config()
                 }
             },
             schema: schema,
-            //   introspection: true,
+            introspection: true,
             //   playground: true,
         });
     

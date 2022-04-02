@@ -1,0 +1,18 @@
+type Post{
+    postId: ID! @id(autogenerate: true, unique: true)
+    title: String 
+    content: String
+    likedBy: [User!]!
+        @relationship(type: "LIKED", properties: "ITime", direction: IN)
+    unlikedBy: [User!]!
+        @relationship(type: "UNLIKED", properties: "ITime", direction: IN)
+    tags: [Tag!]!
+        @relationship(type: "TAGGED", properties: "ITime", direction: IN)
+    createdBy: User!
+        @relationship(type: "CREATED", properties: "ITime", direction: IN)
+    place: Place
+        @relationship(type: "LOCATED", properties: "ITime", direction: IN)
+    createdAt: DateTime! @timestamp(operations: [CREATE])
+    updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+    coords: Point!
+}
