@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Autocomplete, Pagination } from "@mui/material";
+import { Autocomplete, Pagination, Skeleton } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
@@ -16,7 +16,7 @@ type postsProps = {
     posts: PostType[];
 };
 export default function ActivityFeed() {
-    const POSTS_PER_PAGE = 1;
+    const POSTS_PER_PAGE = 4;
     const [page, setPage] = React.useState(1);
     const [tags, setTags] = React.useState<string[]>([]);
     const [posts, setPosts] = React.useState<any[]>([]);
@@ -25,6 +25,11 @@ export default function ActivityFeed() {
             options: {
                 limit: POSTS_PER_PAGE,
                 offset: (page - 1) * POSTS_PER_PAGE,
+                sort: [
+                    {
+                        createdAt: "ASC",
+                    },
+                ],
             },
             where: {
                 tags_SOME: {
@@ -34,27 +39,23 @@ export default function ActivityFeed() {
                           }
                         : { name_NOT_IN: tags }),
                 },
-
-                ...tags.reduce((acc, curr) => {
-                    return {
-                        OR: [
-                            {
-                                title_CONTAINS: curr,
-                                OR: [acc],
-                            },
-                        ],
-                    };
-                }, {}),
+                coords_LTE: {
+                    distance: 2000,
+                    point: {
+                        longitude: 19.88620880792971,
+                        latitude: 50.02109674600602,
+                    },
+                },
             },
         },
 
         onCompleted: (data) => {
             console.log(data);
             setPosts(data.posts);
-            setCount(data.postsAggregate.count);
+            setCount(~~(data.postsAggregate.count / POSTS_PER_PAGE));
         },
     });
-    const [count, setCount] = React.useState(10);
+    const [count, setCount] = React.useState(1);
     const [sort, setSort] = React.useState("1");
 
     const handleChange = (event: SelectChangeEvent) =>
@@ -112,15 +113,30 @@ export default function ActivityFeed() {
                 </Grid>
             </Grid>
             <Grid item container spacing={3}>
-                {!loading &&
-                    !error &&
+                {!loading && !error ? (
                     posts.map((post, index) => (
                         <Post
                             key={index}
                             {...post}
                             onChipClick={handleTagClick}
                         />
-                    ))}
+                    ))
+                ) : (
+                    <React.Fragment>
+                        <Grid item md={6} sm={12}>
+                            <Skeleton width="100%" height={242} />
+                        </Grid>
+                        <Grid item md={6} sm={12}>
+                            <Skeleton width="100%" height={242} />
+                        </Grid>
+                        <Grid item md={6} sm={12}>
+                            <Skeleton width="100%" height={242} />
+                        </Grid>
+                        <Grid item md={6} sm={12}>
+                            <Skeleton width="100%" height={242} />
+                        </Grid>
+                    </React.Fragment>
+                )}
             </Grid>
             <Grid
                 item
