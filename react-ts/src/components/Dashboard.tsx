@@ -8,6 +8,12 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
+import SendIcon from "@mui/icons-material/Send";
+import BaseActivityFeed from "./ActivityFeed/ActivityFeed";
+import MainMap from "./MainMap";
 
 import {
     CssBaseline,
@@ -21,18 +27,15 @@ import {
     IconButton,
     Container,
     ListItem,
-    ListItemText,
-    ListItemIcon,
-  } from '@mui/material'
+} from "@mui/material";
 
-  import {
-    
+import {
     Home as HomeIcon,
     GroupAdd as GroupAddIcon,
     AccountCircle as AccountCircleIcon,
     ConnectWithoutContact as ConnectWithoutContactIcon,
-  } from '@mui/icons-material'
-  import LogoutIcon from '@mui/icons-material/Logout';
+} from "@mui/icons-material";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useSignOut } from "react-auth-kit";
 
 function Copyright(props: any) {
@@ -103,11 +106,15 @@ const Drawer = styled(MuiDrawer, {
     },
 }));
 
+const ActivityFeed = styled(BaseActivityFeed)({
+    backgroundColor: "#f00",
+});
+
 const mdTheme = createTheme();
 
 function DashboardContent() {
     const [open, setOpen] = React.useState(true);
-    const signOut = useSignOut()
+    const signOut = useSignOut();
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -165,12 +172,16 @@ function DashboardContent() {
                     </Toolbar>
                     <Divider />
                     <List component="nav">
-                        <Link color="primary" onClick={() => signOut()} href="#">
+                        <Link
+                            color="primary"
+                            onClick={() => signOut()}
+                            href="#"
+                        >
                             <ListItem button>
-                            <ListItemIcon>
-                                <LogoutIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Logout" />
+                                <ListItemIcon>
+                                    <LogoutIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Logout" />
                             </ListItem>
                         </Link>
                     </List>
@@ -187,43 +198,10 @@ function DashboardContent() {
                         overflow: "auto",
                     }}
                 >
+                    <MainMap></MainMap>
                     <Toolbar />
                     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                        <Grid container spacing={3}>
-                            {/* Chart */}
-                            <Grid item xs={12} md={8} lg={9}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        height: 240,
-                                    }}
-                                ></Paper>
-                            </Grid>
-                            {/* Recent Deposits */}
-                            <Grid item xs={12} md={4} lg={3}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        height: 240,
-                                    }}
-                                ></Paper>
-                            </Grid>
-                            {/* Recent Orders */}
-                            <Grid item xs={12}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    }}
-                                ></Paper>
-                            </Grid>
-                        </Grid>
-                        <Copyright sx={{ pt: 4 }} />
+                        <ActivityFeed />
                     </Container>
                 </Box>
             </Box>
