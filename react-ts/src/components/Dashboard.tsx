@@ -18,6 +18,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";import SearchBarTags from "./searchBarTags/SearchBarTags";
 import { top100Films } from "./searchBarTags/options";
+import PostForm from "./postForm/postForm";
 ;
 
 function Copyright(props: any) {
@@ -173,10 +174,10 @@ function DashboardContent() {
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
-                    height: 240,
                   }}
                 >
                   <SearchBarTags optionTags={top100Films} />
+                  <PostForm locations={['mariacki - 1m','zabpka - 2m']}/>
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
