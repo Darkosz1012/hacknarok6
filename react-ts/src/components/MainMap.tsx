@@ -2,7 +2,7 @@ import { Icon, LatLng, Point } from 'leaflet';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'  
+import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -12,6 +12,7 @@ import pinIcon from '../resources/pinIcon2.svg';
 import { Fab, Box } from '@mui/material';
 import { PostMarker } from "./postMarker/postMarker";
 import { gql, useQuery } from '@apollo/client';
+import useInterval from 'use-interval';
 
 const GET_PLACES = gql`
 query Places($where: PlaceWhere, $options: PlaceOptions) {
@@ -42,73 +43,88 @@ function AddButton(props: any) {
 
   return (
     <Box>
-    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display:'flex', flexDirection:'column-reverse', justifyContent: 'space-between', height:'17rem'}}>
-      <Fab sx={{ width: '5rem', height: '5rem' }} color={active ? 'error' : 'primary'} onClick={(e => {
-        e.stopPropagation();
-        setActive(!active);
-      })}>
-        {!active && <AddIcon sx={{width:'50%', height:'50%'}}></AddIcon>}
-        {active && <CloseIcon sx={{width:'50%', height:'50%'}}></CloseIcon>}
-      </Fab>
-      {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd(map.getCenter()))}>
-        <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>
-      </Fab>}
+      <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display: 'flex', flexDirection: 'column-reverse', justifyContent: 'space-between', height: '17rem' }}>
+        <Fab sx={{ width: '5rem', height: '5rem' }} color={active ? 'error' : 'primary'} onClick={(e => {
+          e.stopPropagation();
+          setActive(!active);
+        })}>
+          {!active && <AddIcon sx={{ width: '50%', height: '50%' }}></AddIcon>}
+          {active && <CloseIcon sx={{ width: '50%', height: '50%' }}></CloseIcon>}
+        </Fab>
+        {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd(map.getCenter()))}>
+          <CheckIcon sx={{ width: '50%', height: '50%' }}></CheckIcon>
+        </Fab>}
         {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => handleMoveToUser())}>
-        <GpsFixedIcon sx={{width:'50%', height:'50%'}}></GpsFixedIcon>
-      </Fab>}
+          <GpsFixedIcon sx={{ width: '50%', height: '50%' }}></GpsFixedIcon>
+        </Fab>}
       </Box>
-      {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex:'1000'}}></PushPinTwoToneIcon>}
+      {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex: '1000' }}></PushPinTwoToneIcon>}
     </Box>
   );
 }
 
 function UserMarker(props: any) {
-    const userIcon = new Icon({
-        iconUrl: pinIcon,
-        iconSize: new Point(40, 40),  
-      });
 
-    const map = useMap();
+  const userIcon = new Icon({
+    iconUrl: pinIcon,
+    iconSize: new Point(40, 40),
+  });
 
-    useEffect(() => {
-      map.locate().on("locationfound", function (e) {
-        props.setPosition(e.latlng);
-        map.flyTo(e.latlng, 15);
-      });
-    }, [map]);
+  const map = useMap();
 
-    return !props.position ? null :(
-        <Marker position={props.position} icon={userIcon}></Marker>
-    );
+  useEffect(() => {
+    if (props.hasCentered || !props.position) return;
+
+    console.log(props.hasCentered);
+
+    map.flyTo(props.position, 13);
+
+    props.setHasCentered(true)
+  }, [props.position]);
+
+  return !props.position ? null : (
+    <Marker position={props.position} icon={userIcon}></Marker>
+  );
 }
 
 function MainMap(props: any) {
   const [position, setPosition] = useState<LatLng | undefined>();
+  const [hasCentered, setHasCentered] = useState(false);
 
-  const { loading, error, data:placeData } = useQuery(GET_PLACES, {
+  console.log('sranie doryja', position)
+
+  useInterval(() => {
+    navigator.geolocation.getCurrentPosition(location => {
+      setPosition(new LatLng(location.coords.latitude, location.coords.longitude));
+    });
+  }, 1000);
+
+
+  const { loading, error, data: placeData } = useQuery(GET_PLACES, {
     variables: {
       "where": {
         "coords_LTE": {
           "point": {
-            "longitude": 50,
-            "latitude": 19
+            "longitude": position?.lng,
+            "latitude": position?.lat
           },
-          "distance": 5000000
+          "distance": 2000
         }
       }
     },
-    pollInterval: 500,
+    pollInterval: 2000,
   })
-  
-    return (
-        <MapContainer style={{height: "calc(100vh - 4rem)", marginTop:"4rem"}} center={[52.1064618,18.5525723]} zoom={7}>
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-        <UserMarker position={position} setPosition={setPosition}/>
-          <AddButton position={position}></AddButton>
+
+  return (
+    <MapContainer style={{ height: "calc(100vh - 4rem)", marginTop: "4rem" }} center={[52.1064618, 18.5525723]} zoom={7}>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <UserMarker position={position} setPosition={setPosition} hasCentered={hasCentered} setHasCentered={setHasCentered} />
+      <AddButton position={position}></AddButton>
       {!loading && !error && placeData.places.map((marker: any, index: number) => {
+        console.log(marker);
         return (
           <PostMarker
             key={index}
@@ -117,8 +133,8 @@ function MainMap(props: any) {
           />
         )
       })}
-        </MapContainer>
-    );                                                                                                          
-}   
+    </MapContainer>
+  );
+}
 
 export default MainMap;

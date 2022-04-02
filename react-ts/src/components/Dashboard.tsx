@@ -219,7 +219,7 @@ function DashboardContent() {
                             overflow: "auto",
                         }}
                     >
-                        <Box maxWidth="lg" sx={{ marginTop: "4rem" }}>
+                        <Box sx={{ marginTop: "4rem" }}>
                             <Route
                                 exact
                                 path="/nearby"
