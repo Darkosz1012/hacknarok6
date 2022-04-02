@@ -13,7 +13,7 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
 import SendIcon from "@mui/icons-material/Send";
 import BaseActivityFeed from "./ActivityFeed/ActivityFeed";
-import MainMap from './MainMap'
+import MainMap from "./MainMap";
 
 import {
     CssBaseline,
@@ -27,18 +27,15 @@ import {
     IconButton,
     Container,
     ListItem,
-    ListItemText,
-    ListItemIcon,
-  } from '@mui/material'
+} from "@mui/material";
 
 import {
-    
-	Home as HomeIcon,
-	GroupAdd as GroupAddIcon,
-	AccountCircle as AccountCircleIcon,
+    Home as HomeIcon,
+    GroupAdd as GroupAddIcon,
+    AccountCircle as AccountCircleIcon,
     ConnectWithoutContact as ConnectWithoutContactIcon,
-} from '@mui/icons-material'
-import LogoutIcon from '@mui/icons-material/Logout';
+} from "@mui/icons-material";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useSignOut } from "react-auth-kit";
 
 function Copyright(props: any) {
@@ -117,7 +114,7 @@ const mdTheme = createTheme();
 
 function DashboardContent() {
     const [open, setOpen] = React.useState(true);
-    const signOut = useSignOut()
+    const signOut = useSignOut();
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -175,12 +172,16 @@ function DashboardContent() {
                     </Toolbar>
                     <Divider />
                     <List component="nav">
-                        <Link color="primary" onClick={() => signOut()} href="#">
+                        <Link
+                            color="primary"
+                            onClick={() => signOut()}
+                            href="#"
+                        >
                             <ListItem button>
-                            <ListItemIcon>
-                                <LogoutIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Logout" />
+                                <ListItemIcon>
+                                    <LogoutIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Logout" />
                             </ListItem>
                         </Link>
                     </List>
