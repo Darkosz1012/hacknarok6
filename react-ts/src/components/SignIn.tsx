@@ -39,6 +39,7 @@ export default function SignIn() {
           token: data.accessToken,
           expiresIn: 60,
           tokenType: 'Bearer',
+          authState: {},
           // refreshToken: data.refreshToken, // Only if you are using refreshToken feature
           // refreshTokenExpireIn: 60,
         })
