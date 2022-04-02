@@ -17,8 +17,16 @@ type PostProps = {
     date: Date;
     tags: string[];
     author: string;
+    onChipClick?: (tag: string) => void;
 };
-export default function Post({ title, body, date, tags, author }: PostProps) {
+export default function Post({
+    title,
+    body,
+    date,
+    tags,
+    author,
+    ...props
+}: PostProps) {
     return (
         <Grid item md={6} sm={12}>
             <Card>
@@ -67,6 +75,10 @@ export default function Post({ title, body, date, tags, author }: PostProps) {
                                 key={tag}
                                 size="small"
                                 sx={{ marginRight: "0.5rem" }}
+                                onClick={() => {
+                                    console.log("clicked", tag);
+                                    props.onChipClick?.(tag);
+                                }}
                             />
                         ))}
                     </Typography>

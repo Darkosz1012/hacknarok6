@@ -8,6 +8,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Post from "./Post";
+import SearchBarTags from "../searchBarTags/SearchBarTags";
 
 export default function ActivityFeed() {
     const posts = [
@@ -67,10 +68,7 @@ export default function ActivityFeed() {
             setTags([...tags, tag]);
         }
     };
-    const handleSearchChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        value: string[] | null
-    ) => {
+    const handleSearchChange = (value: string[] | null) => {
         setTags(value ?? []);
     };
 
@@ -80,31 +78,12 @@ export default function ActivityFeed() {
         <Grid container spacing={3}>
             <Grid item container spacing={3}>
                 <Grid item xs>
-                    <Autocomplete
-                        multiple
+                    <SearchBarTags
+                        onChange={handleSearchChange}
+                        optionTags={[]}
+                        label="Filter by tags"
                         limitTags={2}
-                        disableCloseOnSelect
-                        id="tags-filled"
-                        options={[]}
-                        freeSolo
                         value={tags}
-                        renderTags={(value: readonly string[], getTagProps) =>
-                            value.map((option: string, index: number) => (
-                                <Chip
-                                    variant="outlined"
-                                    label={option}
-                                    {...getTagProps({ index })}
-                                    onClick={() => handleTagClick(option)}
-                                />
-                            ))
-                        }
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="outlined"
-                                label="Filter by tag"
-                            />
-                        )}
                     />
                 </Grid>
                 <Grid item>
@@ -128,7 +107,11 @@ export default function ActivityFeed() {
             </Grid>
             <Grid item container spacing={3}>
                 {posts.map((post) => (
-                    <Post key={post.title} {...post} />
+                    <Post
+                        key={post.title}
+                        {...post}
+                        onChipClick={handleTagClick}
+                    />
                 ))}
             </Grid>
             <Grid
