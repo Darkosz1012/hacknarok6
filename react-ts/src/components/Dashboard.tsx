@@ -1,16 +1,7 @@
 import * as React from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiDrawer from "@mui/material/Drawer";
-import Box from "@mui/material/Box";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
+import { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
@@ -22,6 +13,33 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
 import SendIcon from "@mui/icons-material/Send";
 import BaseActivityFeed from "./ActivityFeed/ActivityFeed";
+import MainMap from './MainMap'
+
+import {
+    CssBaseline,
+    Drawer as MuiDrawer,
+    Box,
+    AppBar as MuiAppBar,
+    Toolbar,
+    List,
+    Typography,
+    Divider,
+    IconButton,
+    Container,
+    ListItem,
+    ListItemText,
+    ListItemIcon,
+  } from '@mui/material'
+
+import {
+    
+	Home as HomeIcon,
+	GroupAdd as GroupAddIcon,
+	AccountCircle as AccountCircleIcon,
+    ConnectWithoutContact as ConnectWithoutContactIcon,
+} from '@mui/icons-material'
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useSignOut } from "react-auth-kit";
 
 function Copyright(props: any) {
     return (
@@ -99,6 +117,7 @@ const mdTheme = createTheme();
 
 function DashboardContent() {
     const [open, setOpen] = React.useState(true);
+    const signOut = useSignOut()
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -156,12 +175,14 @@ function DashboardContent() {
                     </Toolbar>
                     <Divider />
                     <List component="nav">
-                        <ListItemButton>
+                        <Link color="primary" onClick={() => signOut()} href="#">
+                            <ListItem button>
                             <ListItemIcon>
-                                <SendIcon />
+                                <LogoutIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Nearby activities" />
-                        </ListItemButton>
+                            <ListItemText primary="Logout" />
+                            </ListItem>
+                        </Link>
                     </List>
                 </Drawer>
                 <Box
@@ -176,6 +197,7 @@ function DashboardContent() {
                         overflow: "auto",
                     }}
                 >
+                    <MainMap></MainMap>
                     <Toolbar />
                     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                         <ActivityFeed />
