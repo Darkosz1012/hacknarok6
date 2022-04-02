@@ -3,6 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {
+  ApolloProvider,
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+
+import { AuthProvider } from 'react-auth-kit'
 
 ReactDOM.render(
   <React.StrictMode>
