@@ -1,0 +1,6 @@
+type Tag{
+    tagId: ID! @id(autogenerate: true, unique: true)
+    name: String
+    createdAt: DateTime! @timestamp(operations: [CREATE])
+    updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+}

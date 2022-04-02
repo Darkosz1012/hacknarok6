@@ -43,7 +43,7 @@ dotenv.config()
                 }
             },
             schema: schema,
-            //   introspection: true,
+            introspection: true,
             //   playground: true,
         });
     

@@ -1,0 +1,9 @@
+type Place{
+    tagId: ID! @id(autogenerate: true, unique: true)
+    name: String!
+    description: String
+    visible: Boolean! 
+    createdAt: DateTime! @timestamp(operations: [CREATE])
+    updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
+    coords: Point!
+}
