@@ -14,6 +14,19 @@ import AddIcon from "@mui/icons-material/Add";
 import pinIcon from "../resources/pinIcon2.svg";
 import { Fab, Box } from "@mui/material";
 import { PostMarker } from "./postMarker/postMarker";
+import { gql, useQuery } from '@apollo/client';
+
+
+const GET_PLACES = gql`
+query Places($where: PlaceWhere, $options: PlaceOptions) {
+  places(where: $where, options: $options) {
+    name
+    coords {
+      longitude
+      latitude
+    }
+  }
+}`;
 
 function AddButton() {
   return (
@@ -48,6 +61,26 @@ function UserMarker() {
 }
 
 function MainMap(props: any) {
+
+  const { loading, error, data:placeData } = useQuery(GET_PLACES, {
+    variables: {
+      "where": {
+        "coords_LTE": {
+          "point": {
+            "longitude": 50,
+            "latitude": 19
+          },
+          "distance": 5000000
+        }
+      }
+    },
+    pollInterval: 500,
+  })
+
+  useEffect(() => {
+    error &&  console.error(error);
+  }, [error])
+
   return (
     <MapContainer
       style={{ height: "100vh" }}
@@ -59,11 +92,16 @@ function MainMap(props: any) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {/* <UserMarker /> */}
-      <PostMarker
-        position={new LatLng(52.1064618, 18.5525723)}
-        open
-        children={<h1>Super Post</h1>}
-      />
+      {!loading && !error && placeData.places.map((marker: any, index: number) => {
+        console.log(index, marker)
+        return (
+          <PostMarker
+            key={index}
+            position={new LatLng(marker.coords.latitude, marker.coords.longitude)}
+            children={<h1>{marker.name}</h1>}
+          />
+        )
+      })}
 
       <AddButton></AddButton>
     </MapContainer>
