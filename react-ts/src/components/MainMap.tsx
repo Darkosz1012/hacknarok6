@@ -4,15 +4,35 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'  
 import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import PushPinTwoToneIcon from '@mui/icons-material/PushPinTwoTone';
 import pinIcon from '../resources/pinIcon2.svg';
 import { Fab, Box } from '@mui/material';
 
 function AddButton() {
+  const [active, setActive] = useState(false);
+
+  const handleAdd = () => {
+    setActive(false);
+    // TODO
+  };
+
   return (
-    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem' }}>
-      <Fab sx={{width:'5rem', height:'5rem'}}>
-        <AddIcon sx={{width:'50%', height:'50%'}}></AddIcon>
+    <Box>
+    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display:'flex', flexDirection:'column-reverse', justifyContent: 'space-between', height:'11rem'}}>
+      <Fab sx={{ width: '5rem', height: '5rem' }} color={active ? 'error' : 'primary'} onClick={(e => {
+        e.stopPropagation();
+        setActive(!active);
+      })}>
+        {!active && <AddIcon sx={{width:'50%', height:'50%'}}></AddIcon>}
+        {active && <CloseIcon sx={{width:'50%', height:'50%'}}></CloseIcon>}
       </Fab>
+      {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd())}>
+        {active && <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>}
+      </Fab>}
+      </Box>
+      {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex:'1000'}}></PushPinTwoToneIcon>}
     </Box>
   )
 }
@@ -41,7 +61,7 @@ function UserMarker() {
 
 function MainMap(props: any) {
     return (
-        <MapContainer style={{height: "100vh"}} center={[52.1064618,18.5525723]} zoom={7}>
+        <MapContainer style={{height: "calc(100vh - 4rem)", marginTop:"4rem"}} center={[52.1064618,18.5525723]} zoom={7}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
