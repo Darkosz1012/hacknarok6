@@ -1,21 +1,17 @@
-import { Icon, LatLng, Point } from "leaflet";
-import * as React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import {
-  MapContainer,
-  Marker,
-  Popup,
-  TileLayer,
-  useMap,
-  Tooltip,
-} from "react-leaflet";
-import AddIcon from "@mui/icons-material/Add";
-import pinIcon from "../resources/pinIcon2.svg";
-import { Fab, Box } from "@mui/material";
+import { Icon, LatLng, Point } from 'leaflet';
+import * as React from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'  
+import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import PushPinTwoToneIcon from '@mui/icons-material/PushPinTwoTone';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import pinIcon from '../resources/pinIcon2.svg';
+import { Fab, Box } from '@mui/material';
 import { PostMarker } from "./postMarker/postMarker";
 import { gql, useQuery } from '@apollo/client';
-
 
 const GET_PLACES = gql`
 query Places($where: PlaceWhere, $options: PlaceOptions) {
@@ -28,39 +24,66 @@ query Places($where: PlaceWhere, $options: PlaceOptions) {
   }
 }`;
 
-function AddButton() {
+function AddButton(props: any) {
+  const [active, setActive] = useState(false);
+
+  const map = useMap();
+
+  const handleAdd = (location: LatLng) => {
+    setActive(false);
+    // SZYMON TUTAJ :OOOO
+    console.log(location);
+  };
+
+  const handleMoveToUser = () => {
+    map.flyTo(props.position, 15);
+    handleAdd(props.position);
+  };
+
   return (
-    <Box sx={{ position: "absolute", bottom: "3rem", right: "3rem" }}>
-      <Fab sx={{ width: "5rem", height: "5rem" }}>
-        <AddIcon sx={{ width: "50%", height: "50%" }}></AddIcon>
+    <Box>
+    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display:'flex', flexDirection:'column-reverse', justifyContent: 'space-between', height:'17rem'}}>
+      <Fab sx={{ width: '5rem', height: '5rem' }} color={active ? 'error' : 'primary'} onClick={(e => {
+        e.stopPropagation();
+        setActive(!active);
+      })}>
+        {!active && <AddIcon sx={{width:'50%', height:'50%'}}></AddIcon>}
+        {active && <CloseIcon sx={{width:'50%', height:'50%'}}></CloseIcon>}
       </Fab>
+      {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd(map.getCenter()))}>
+        <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>
+      </Fab>}
+        {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => handleMoveToUser())}>
+        <GpsFixedIcon sx={{width:'50%', height:'50%'}}></GpsFixedIcon>
+      </Fab>}
+      </Box>
+      {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex:'1000'}}></PushPinTwoToneIcon>}
     </Box>
   );
 }
 
-function UserMarker() {
-  const userIcon = new Icon({
-    iconUrl: pinIcon,
-    iconSize: new Point(40, 40),
-  });
+function UserMarker(props: any) {
+    const userIcon = new Icon({
+        iconUrl: pinIcon,
+        iconSize: new Point(40, 40),  
+      });
 
-  const [position, setPosition] = useState<LatLng | undefined>();
+    const map = useMap();
 
-  const map = useMap();
+    useEffect(() => {
+      map.locate().on("locationfound", function (e) {
+        props.setPosition(e.latlng);
+        map.flyTo(e.latlng, 15);
+      });
+    }, [map]);
 
-  useEffect(() => {
-    map.locate().on("locationfound", function (e) {
-      setPosition(e.latlng);
-      map.flyTo(e.latlng, 15);
-    });
-  }, [map]);
-
-  return !position ? null : (
-    <Marker position={position} icon={userIcon}></Marker>
-  );
+    return !props.position ? null :(
+        <Marker position={props.position} icon={userIcon}></Marker>
+    );
 }
 
 function MainMap(props: any) {
+  const [position, setPosition] = useState<LatLng | undefined>();
 
   const { loading, error, data:placeData } = useQuery(GET_PLACES, {
     variables: {
@@ -76,24 +99,16 @@ function MainMap(props: any) {
     },
     pollInterval: 500,
   })
-
-  useEffect(() => {
-    error &&  console.error(error);
-  }, [error])
-
-  return (
-    <MapContainer
-      style={{ height: "100vh" }}
-      center={[52.1064618, 18.5525723]}
-      zoom={7}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {/* <UserMarker /> */}
+  
+    return (
+        <MapContainer style={{height: "calc(100vh - 4rem)", marginTop:"4rem"}} center={[52.1064618,18.5525723]} zoom={7}>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+        <UserMarker position={position} setPosition={setPosition}/>
+          <AddButton position={position}></AddButton>
       {!loading && !error && placeData.places.map((marker: any, index: number) => {
-        console.log(index, marker)
         return (
           <PostMarker
             key={index}
@@ -102,10 +117,8 @@ function MainMap(props: any) {
           />
         )
       })}
-
-      <AddButton></AddButton>
-    </MapContainer>
-  );
-}
+        </MapContainer>
+    );                                                                                                          
+}   
 
 export default MainMap;
