@@ -16,16 +16,15 @@ function AddButton(props: any) {
 
   const map = useMap();
 
-  const handleAdd = () => {
+  const handleAdd = (location: LatLng) => {
     setActive(false);
-
-    const location = map.getCenter();
     // SZYMON TUTAJ :OOOO
     console.log(location);
   };
 
   const handleMoveToUser = () => {
     map.flyTo(props.position, 15);
+    handleAdd(props.position);
   };
 
   return (
@@ -38,13 +37,10 @@ function AddButton(props: any) {
         {!active && <AddIcon sx={{width:'50%', height:'50%'}}></AddIcon>}
         {active && <CloseIcon sx={{width:'50%', height:'50%'}}></CloseIcon>}
       </Fab>
-      {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd())}>
+      {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd(map.getCenter()))}>
         <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>
       </Fab>}
-        {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => {
-          handleMoveToUser();
-          handleAdd();
-        })}>
+        {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => handleMoveToUser())}>
         <GpsFixedIcon sx={{width:'50%', height:'50%'}}></GpsFixedIcon>
       </Fab>}
       </Box>
