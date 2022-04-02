@@ -219,13 +219,13 @@ function DashboardContent() {
                             overflow: "auto",
                         }}
                     >
-                        <Box maxWidth="lg" sx={{ marginTop: "4rem" }}>
+                        <Box sx={{ marginTop: "4rem" }}>
                             <Route
                                 exact
                                 path="/nearby"
                                 component={ActivityFeed}
                             />
-                            <Route path="/" component={MainMap} />
+                            <Route exact path="/" component={MainMap} />
                         </Box>
                     </Box>
                 </Box>
