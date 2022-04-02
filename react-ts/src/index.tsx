@@ -10,7 +10,7 @@ import {
   createHttpLink,
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-
+import 'leaflet/dist/leaflet.css'
 import { AuthProvider } from 'react-auth-kit'
 
 ReactDOM.render(
