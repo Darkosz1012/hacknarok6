@@ -108,18 +108,20 @@ export default function (ogm, driver) {
             await await Tag.create({
               input:{name: name}
             })
+          await Post.update({
+            "where": { "postId": post.posts[0].postId },
+            "update": {
+              "tags": {
+                  'connect': {
+                    "where": { "node": { "name": name } }
+                  }
+                }
+            },
+          })
+    
         }
         console.log("post" ,post,post.posts[0].postId)
-         await Post.update({
-          "where": { "postId": post.posts[0].postId },
-          "update": {
-            "tags": {
-                'connect': {
-                  "where": { "node": { "name": name } }
-                }
-              }
-          },
-        })
+        
         let selectionSet =`
         {
           postId
