@@ -9,8 +9,32 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Post from "./Post";
 import SearchBarTags from "../searchBarTags/SearchBarTags";
+import { gql, useQuery } from '@apollo/client';
+
+const GetPosts = gql`
+  query GetPosts {
+    posts {
+      title
+      content
+      createdBy{
+          username
+          userId
+      }
+      createdAt
+      coords{
+          longitude
+          latitude
+      }
+      tags{
+          name
+      }
+    }
+  }
+`;
 
 export default function ActivityFeed() {
+    const { loading, error, data } = useQuery(GetPosts);
+    console.log(data)
     const posts = [
         {
             title: "Post 1",
@@ -48,6 +72,7 @@ export default function ActivityFeed() {
             tags: ["tag1", "tag2"],
         },
     ];
+    
     const [sort, setSort] = React.useState("1");
     const [page, setPage] = React.useState(1);
     const [count, setCount] = React.useState(10);
