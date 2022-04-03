@@ -129,7 +129,7 @@ export default function ActivityFeed(props: ActivityFeedProps) {
                 <Grid item xs>
                     <SearchBarTags
                         onChange={handleSearchChange}
-                        optionTags={[]}
+                        optionTags={dataTags?.tags??[]}
                         label="Filter by tags"
                         limitTags={2}
                         value={tags}

@@ -20,6 +20,7 @@ export const GET_POSTS_QUERY = gql`
             tags {
                 name
             }
+            img
             grade
             iLike
             iUnlike
