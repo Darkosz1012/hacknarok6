@@ -26,12 +26,29 @@ import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
 
 const GET_PLACES = gql`
-  query Places($where: PlaceWhere, $options: PlaceOptions) {
+  query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
     places(where: $where, options: $options) {
       name
       coords {
         longitude
         latitude
+      }
+    }
+
+    posts(where: $where2) {
+      title
+      content
+      createdBy {
+        username
+        userId
+      }
+      createdAt
+      coords {
+        longitude
+        latitude
+      }
+      tags {
+        name
       }
     }
   }
@@ -194,6 +211,15 @@ function MainMap(props: any) {
           distance: distanceRange,
         },
       },
+      where2: {
+        coords_LTE: {
+          point: {
+            longitude: position?.lng,
+            latitude: position?.lat,
+          },
+          distance: distanceRange,
+        },
+      },
     },
     pollInterval: 2000,
   });
@@ -250,20 +276,34 @@ function MainMap(props: any) {
         setHasCentered={setHasCentered}
       />
       <AddButton position={position} onAdd={onAdd}></AddButton>
-      {!loading &&
-        !error &&
-        placeData.places.map((marker: any, index: number) => {
-          console.log(marker);
-          return (
-            <PostMarker
-              key={index}
-              position={
-                new LatLng(marker.coords.latitude, marker.coords.longitude)
-              }
-              children={<h1>{marker.name}</h1>}
-            />
-          );
-        })}
+      {!loading && !error && (
+        <>
+          {placeData.places.map((marker: any, index: number) => {
+            return (
+              <PostMarker
+                key={index}
+                position={
+                  new LatLng(marker.coords.latitude, marker.coords.longitude)
+                }
+                children={<h1>{marker.name}</h1>}
+                type={"home"}
+              />
+            );
+          })}
+          {placeData.posts.map((marker: any, index: number) => {
+            return (
+              <PostMarker
+                key={index}
+                position={
+                  new LatLng(marker.coords.latitude, marker.coords.longitude)
+                }
+                children={<h1>{marker.name}</h1>}
+                type={"pin"}
+              />
+            );
+          })}
+        </>
+      )}
 
       <Dialog
         fullScreen

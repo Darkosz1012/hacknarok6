@@ -32,6 +32,7 @@ const GET_TAGS = gql`
         latitude
       }
     }
+    
   }
 `;
 

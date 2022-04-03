@@ -1,5 +1,6 @@
 import * as React from "react";
 import pinIcon from "../../resources/fire-512.webp";
+import pinIconHome from "../../resources/residence-512.webp";
 import { Marker, Popup, useMap } from "react-leaflet";
 import { Icon, Point, LatLng, Popup as PopupType } from "leaflet";
 import { useEffect, useRef } from "react";
@@ -8,11 +9,12 @@ interface PostMarkerProps {
   position: LatLng;
   children?: React.ReactNode;
   open?: boolean;
+  type?: "pin" | "home";
 }
 
 export function PostMarker(props: PostMarkerProps) {
   const userIcon = new Icon({
-    iconUrl: pinIcon,
+    iconUrl: props.type === "home" ? pinIconHome : pinIcon,
     iconSize: new Point(40, 40),
   });
   const popupRef = useRef<PopupType | null>(null);
@@ -28,11 +30,7 @@ export function PostMarker(props: PostMarkerProps) {
 
   return (
     <Marker position={props.position} icon={userIcon}>
-      <Popup
-        ref={popupRef}
-      >
-        {props.children}
-      </Popup>
+      <Popup ref={popupRef}>{props.children}</Popup>
     </Marker>
   );
 }
