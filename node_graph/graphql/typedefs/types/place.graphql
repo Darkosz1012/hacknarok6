@@ -6,4 +6,11 @@ type Place{
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
     coords: Point!
+    countPosts: Int
+    @cypher(
+      statement: """
+        MATCH (this)
+        OPTIONAL MATCH (this)-[l : LOCATED]-(:Post)
+        RETURN COUNT(l) 
+        """)
 }

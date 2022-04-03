@@ -7,8 +7,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 interface MediaCardProps {
+  onShow?: () => void;
   place: {
     name: string;
+    countPosts: number;
   };
 }
 
@@ -25,8 +27,15 @@ export default function MediaCard(props: MediaCardProps) {
           {props.place.name}
         </Typography>
       </CardContent>
-      <CardActions sx={{justifyContent:'flex-end'}}>
-        <Button size="small" variant="contained">Show posts</Button>
+      <CardActions sx={{ justifyContent: "flex-end" }}>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => props.onShow?.call(null)}
+        >
+          Show posts{" "}
+          {props.place.countPosts ? `(${props.place.countPosts})` : ""}
+        </Button>
       </CardActions>
     </Card>
   );

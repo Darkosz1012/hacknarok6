@@ -17,6 +17,7 @@ import {
   IconButton,
   Slide,
   Toolbar,
+  Button,
 } from "@mui/material";
 import { PostMarker } from "./postMarker/postMarker";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -25,15 +26,18 @@ import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
 import PlaceCard from "./placeCard/PlaceCard";
+import ActivityFeed from "./ActivityFeed/ActivityFeed";
 
 const GET_PLACES = gql`
   query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
     places(where: $where, options: $options) {
+      placeId
       name
       coords {
         longitude
         latitude
       }
+      countPosts
     }
 
     posts(where: $where2) {
@@ -213,6 +217,7 @@ function MainMap(props: any) {
         },
       },
       where2: {
+        place: null,
         coords_LTE: {
           point: {
             longitude: position?.lng,
@@ -227,11 +232,16 @@ function MainMap(props: any) {
 
   const [addLocation, setAddLocation] = useState<LatLng | undefined>();
 
-  const [openAdd, setOpenAdd] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMode, setDialogMode] = useState("Add");
+  const [placeId, setPlaceId] = useState("");
+  const [placeLoc, setPlaceLoc] = useState<any>();
 
   const onAdd = (location: LatLng) => {
+    setDialogMode("Add");
     setAddLocation(location);
-    setOpenAdd(true);
+    setPlaceLoc(undefined);
+    setOpenDialog(true);
   };
 
   const [mutateFunction] = useMutation(ADD_POST_MUTATION, {
@@ -245,7 +255,7 @@ function MainMap(props: any) {
   });
 
   const handleAdd = (data: PostData) => {
-    setOpenAdd(false);
+    setOpenDialog(false);
     mutateFunction({
       variables: {
         title: data.title,
@@ -286,7 +296,21 @@ function MainMap(props: any) {
                 position={
                   new LatLng(marker.coords.latitude, marker.coords.longitude)
                 }
-                children={<PlaceCard place={marker}></PlaceCard>}
+                children={
+                  <PlaceCard
+                    place={marker}
+                    onShow={() => {
+                      setDialogMode("Posts");
+                      setPlaceId(marker.placeId);
+                      setPlaceLoc({
+                        lng: marker.coords.longitude,
+                        lat: marker.coords.latitude,
+                        place: marker.placeId,
+                      });
+                      setOpenDialog(true);
+                    }}
+                  ></PlaceCard>
+                }
                 type={"home"}
               />
             );
@@ -308,9 +332,9 @@ function MainMap(props: any) {
 
       <Dialog
         fullScreen
-        open={openAdd}
+        open={openDialog}
         onClose={() => {
-          setOpenAdd(false);
+          setOpenDialog(false);
         }}
         TransitionComponent={Transition}
       >
@@ -321,18 +345,38 @@ function MainMap(props: any) {
               color="inherit"
               aria-label="close"
               onClick={() => {
-                setOpenAdd(false);
+                setOpenDialog(false);
               }}
             >
               <CloseIcon />
             </IconButton>
+            {dialogMode === "Posts" && (
+              <Button
+                sx={{ marginLeft: "auto" }}
+                autoFocus
+                color="inherit"
+                onClick={() => {
+                  setDialogMode("Add");
+                }}
+              >
+                Add new post
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
-        <PostForm
-          currentLocation={addLocation}
-          sx={{ width: "100%", maxWidth: "600px", margin: " 20px auto" }}
-          onSubmit={handleAdd}
-        />
+        {dialogMode === "Add" && (
+          <PostForm
+            currentLocation={addLocation ?? position}
+            sx={{ width: "100%", maxWidth: "600px", margin: " 20px auto" }}
+            onSubmit={handleAdd}
+            place={placeLoc}
+          />
+        )}
+        {dialogMode === "Posts" && (
+          <>
+            <ActivityFeed placeId={placeId}></ActivityFeed>
+          </>
+        )}
       </Dialog>
     </MapContainer>
   );

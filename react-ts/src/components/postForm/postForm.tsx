@@ -32,7 +32,6 @@ const GET_TAGS = gql`
         latitude
       }
     }
-    
   }
 `;
 
@@ -46,12 +45,13 @@ export interface PostData {
 interface PostFormProps {
   onSubmit?: (data: PostData) => void;
   currentLocation?: LatLng;
+  place?: LatLng;
   sx?: SxProps<Theme>;
 }
 
 export default function PostForm(props: PostFormProps) {
   const [location, setLocation] = useState(
-    JSON.stringify(props.currentLocation)
+    JSON.stringify(props.place ?? props.currentLocation)
   );
 
   const [content, setContent] = useState("");
