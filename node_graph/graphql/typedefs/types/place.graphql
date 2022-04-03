@@ -1,8 +1,6 @@
 type Place{
     placeId: ID! @id(autogenerate: true, unique: true)
     name: String! @unique
-    description: String
-    visible: Boolean! 
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
     coords: Point!
