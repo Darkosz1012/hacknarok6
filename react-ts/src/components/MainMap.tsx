@@ -21,6 +21,7 @@ import {
 import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useMutation, gql } from "@apollo/client";
+import axios from "axios";
 
 const ADD_POST_MUTATION = gql`
   mutation createPost(
@@ -131,6 +132,19 @@ function MainMap(props: any) {
 
   const handleAdd = (data: PostData) => {
     setOpenAdd(false);
+    console.log(data)
+    const formData = new FormData();
+    formData.append('image',data.img);
+    const config = {
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    };
+    axios.post("/upload",formData,config)
+        .then((response) => {
+            console.log("The file is successfully uploaded");
+        }).catch((error) => {
+    });
     mutateFunction({
       variables: {
         title: data.title,
