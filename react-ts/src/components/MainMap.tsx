@@ -24,6 +24,7 @@ import useInterval from "use-interval";
 import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
+import PlaceCard from "./placeCard/PlaceCard";
 
 const GET_PLACES = gql`
   query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
@@ -285,7 +286,7 @@ function MainMap(props: any) {
                 position={
                   new LatLng(marker.coords.latitude, marker.coords.longitude)
                 }
-                children={<h1>{marker.name}</h1>}
+                children={<PlaceCard place={marker}></PlaceCard>}
                 type={"home"}
               />
             );
