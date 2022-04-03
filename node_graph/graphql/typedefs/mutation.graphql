@@ -7,5 +7,5 @@ type Mutation {
   signUp(username: String!, email: String!, password: String!): Token!
   refreshToken(refreshToken: String!): Token!
 
-  createPost(title: String!, content: String!, coords: PointInput!, tags: [String!], place:String ): Message
+  createPost(title: String!, content: String!, coords: PointInput!, tags: [String!], place:String, img:String): Message
 }

@@ -23,7 +23,8 @@ dotenv.config()
     const storage = multer.diskStorage({
         destination: "./public/uploads/",
         filename: function (req, file, cb) {
-            cb(null, req.body.name + path.extname(file.originalname));
+            // console.log(req, req.body)
+            cb(null, file.originalname );//+ path.extname(file.originalname)
         }
     });
 
@@ -34,13 +35,12 @@ dotenv.config()
         },
     })
     const router = express.Router();
-    app.post('/photos/upload', upload.array('photos', 12), function (req, res, next) {
+    app.post('/photos/upload', upload.single('image'), function (req, res, next) {
        
         console.log("Request ---", req.body);
-            console.log("Request file ---", req.file); //Here you get file.
+        console.log("Request file ---", req.file); //Here you get file.
             /*Now do where ever you want to do*/
-            if (!err)
-                return res.send(200).end();
+        return res.send(200).end();
     })
     const driver = neo4j.driver(
         process.env.NEO4J_URI || 'bolt://localhost:7687',

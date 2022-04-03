@@ -30,6 +30,7 @@ const ADD_POST_MUTATION = gql`
     $coords: PointInput!
     $tags: [String!]
     $place: String
+    $img:String
   ) {
     createPost(
       title: $title
@@ -37,6 +38,7 @@ const ADD_POST_MUTATION = gql`
       coords: $coords
       tags: $tags
       place: $place
+      img: $img
     ) {
       success
     }
@@ -135,12 +137,16 @@ function MainMap(props: any) {
     console.log(data)
     const formData = new FormData();
     formData.append('image',data.img);
+    let name = data.img.name;
+    console.log(name)
+    formData.append('name',name);
     const config = {
         headers: {
             'content-type': 'multipart/form-data'
-        }
+        },
+        
     };
-    axios.post("/upload",formData,config)
+    axios.post("/photos/upload",formData,config)
         .then((response) => {
             console.log("The file is successfully uploaded");
         }).catch((error) => {
@@ -155,6 +161,7 @@ function MainMap(props: any) {
         },
         tags: data.tags,
         place: data.place,
+        img: name
       },
     });
   };
