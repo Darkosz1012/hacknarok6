@@ -10,6 +10,7 @@ export type PostType = {
         longitude: number;
         latitude: number;
     };
+    img: string;
     tags: {
         name: string;
     }[];

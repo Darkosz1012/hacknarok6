@@ -21,6 +21,14 @@ interface ActivityFeedProps {
   placeId?: string;
 }
 
+const GET_TAGS = gql`
+  query Tags{
+    tags {
+      name
+    }
+  }
+`;
+
 export default function ActivityFeed(props: ActivityFeedProps) {
   const POSTS_PER_PAGE = 1;
   const [page, setPage] = React.useState(1);
@@ -67,6 +75,8 @@ export default function ActivityFeed(props: ActivityFeedProps) {
       } catch (e) {}
     },
   });
+
+  const { data: dataTags } = useQuery(GET_TAGS);
   const [count, setCount] = React.useState(10);
   const [sort, setSort] = React.useState("1");
 
@@ -97,7 +107,7 @@ export default function ActivityFeed(props: ActivityFeedProps) {
         <Grid item xs>
           <SearchBarTags
             onChange={handleSearchChange}
-            optionTags={[]}
+            optionTags={dataTags?.tags ?? []}
             label="Filter by tags"
             limitTags={2}
             value={tags}
