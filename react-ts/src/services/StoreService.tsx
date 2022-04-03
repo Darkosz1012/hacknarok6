@@ -1,4 +1,6 @@
-import { ReactNode,  useState } from "react";
+import { ApolloError, gql, useQuery, ApolloQueryResult } from "@apollo/client";
+import { LatLng } from "leaflet";
+import React, { ReactNode,  useState } from "react";
 import { createGenericContext } from "./GenericContext";
 export interface StoreProps {
   children: ReactNode;
@@ -7,15 +9,105 @@ export interface StoreProps {
 export interface IStore {
   distanceRange: number;
   setDistanceRange: React.Dispatch<React.SetStateAction<number>>;
+  position: LatLng | undefined;
+  setPosition: React.Dispatch<React.SetStateAction<LatLng | undefined>>;
+  placeQueryResult: {
+    loading: boolean,
+    error?: ApolloError | undefined,
+    data: {
+      places: {
+        name: string,
+        coords: {
+          longitude: number,
+          lattitude: number,
+        }
+      }[],
+      posts: {
+        title: string,
+        content: string,
+        createdBy: {
+          username: string,
+          userId: string,
+        },
+        createdAt: string,
+        coords: {
+          longitude: number,
+          lattitude: number,
+        },
+        tags: {
+          name: string,
+        }[]
+      }[]
+    },
+    refetch: (variables?: Partial<any>) => Promise<any>
+  }
 }
+
+const GET_PLACES = gql`
+  query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
+    places(where: $where, options: $options) {
+      name
+      coords {
+        longitude
+        latitude
+      }
+    }
+
+    posts(where: $where2) {
+      title
+      content
+      createdBy {
+        username
+        userId
+      }
+      createdAt
+      coords {
+        longitude
+        latitude
+      }
+      tags {
+        name
+      }
+    }
+  }
+`;
 
 const [useStore, StoreContextProvider] = createGenericContext<IStore>();
 
 const Store = (props: StoreProps) => {
   const [distanceRange, setDistanceRange] = useState(2500);
+  const [position, setPosition] = useState<LatLng | undefined>();
+
+  const placeQueryResult = useQuery(GET_PLACES, {
+    variables: {
+      where: {
+        coords_LTE: {
+          point: {
+            longitude: position?.lng ?? 0,
+            latitude: position?.lat  ?? 0,
+          },
+          distance: position?.lng ? distanceRange : 0,
+        },
+      },
+      where2: {
+        coords_LTE: {
+          point: {
+            longitude: position?.lng ?? 0,
+            latitude: position?.lat ?? 0,
+          },
+          distance: position?.lng ? distanceRange : 0,
+        },
+      },
+    },
+    pollInterval: 2000,
+  });
+
   const value: IStore = {
     distanceRange,
     setDistanceRange,
+    position,
+    setPosition,
+    placeQueryResult,
   };
 
   return (

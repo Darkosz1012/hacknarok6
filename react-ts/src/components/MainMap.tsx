@@ -25,35 +25,6 @@ import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
 
-const GET_PLACES = gql`
-  query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
-    places(where: $where, options: $options) {
-      name
-      coords {
-        longitude
-        latitude
-      }
-    }
-
-    posts(where: $where2) {
-      title
-      content
-      createdBy {
-        username
-        userId
-      }
-      createdAt
-      coords {
-        longitude
-        latitude
-      }
-      tags {
-        name
-      }
-    }
-  }
-`;
-
 const ADD_POST_MUTATION = gql`
   mutation createPost(
     $title: String!
@@ -183,9 +154,8 @@ const Transition = React.forwardRef(function Transition(
 });
 
 function MainMap(props: any) {
-  const { distanceRange } = useStore();
+  const { distanceRange, position, setPosition, placeQueryResult } = useStore();
 
-  const [position, setPosition] = useState<LatLng | undefined>();
   const [hasCentered, setHasCentered] = useState(false);
 
   useInterval(() => {
@@ -196,33 +166,15 @@ function MainMap(props: any) {
     });
   }, 1000);
 
+  useEffect(() => {
+    placeQueryResult.refetch()
+  }, [distanceRange])
+
   const {
     loading,
     error,
     data: placeData,
-  } = useQuery(GET_PLACES, {
-    variables: {
-      where: {
-        coords_LTE: {
-          point: {
-            longitude: position?.lng,
-            latitude: position?.lat,
-          },
-          distance: distanceRange,
-        },
-      },
-      where2: {
-        coords_LTE: {
-          point: {
-            longitude: position?.lng,
-            latitude: position?.lat,
-          },
-          distance: distanceRange,
-        },
-      },
-    },
-    pollInterval: 2000,
-  });
+  } = placeQueryResult;
 
   const [addLocation, setAddLocation] = useState<LatLng | undefined>();
 
@@ -276,9 +228,9 @@ function MainMap(props: any) {
         setHasCentered={setHasCentered}
       />
       <AddButton position={position} onAdd={onAdd}></AddButton>
-      {!loading && !error && (
+      {!error && (
         <>
-          {placeData.places.map((marker: any, index: number) => {
+          {placeData?.places.map((marker: any, index: number) => {
             return (
               <PostMarker
                 key={index}
@@ -290,7 +242,7 @@ function MainMap(props: any) {
               />
             );
           })}
-          {placeData.posts.map((marker: any, index: number) => {
+          {placeData?.posts.map((marker: any, index: number) => {
             return (
               <PostMarker
                 key={index}
