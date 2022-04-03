@@ -13,4 +13,9 @@ export type PostType = {
     tags: {
         name: string;
     }[];
+    likedByAggregate: {
+        count: number;
+    };
+    iLike: boolean;
+    iUnlike: boolean;
 };

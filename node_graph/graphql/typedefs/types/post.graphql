@@ -1,6 +1,6 @@
-type Post{
+type Post {
     postId: ID! @id(autogenerate: true, unique: true)
-    title: String 
+    title: String
     content: String
     likedBy: [User!]!
         @relationship(type: "LIKED", properties: "ITime", direction: IN)
@@ -15,4 +15,20 @@ type Post{
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
     coords: Point!
+    iLike: Int
+        @cypher(
+            statement: """
+            MATCH (this)-[l:likedBy]-(u:User {userId: $auth.jwt.sub})
+            RETURN COUNT(l)
+            """
+        )
+        @auth(rules: [{ isAuthenticated: true }])
+    iUnlike: Int
+        @cypher(
+            statement: """
+            MATCH (this)-[l:unlikedBy]-(u:User {userId: $auth.jwt.sub})
+            RETURN COUNT(l)
+            """
+        )
+        @auth(rules: [{ isAuthenticated: true }])
 }

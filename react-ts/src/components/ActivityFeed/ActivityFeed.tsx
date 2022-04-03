@@ -50,9 +50,13 @@ export default function ActivityFeed() {
         },
 
         onCompleted: (data) => {
-            console.log(data);
-            setPosts(data.posts);
-            setCount(~~(data.postsAggregate.count / POSTS_PER_PAGE));
+            try {
+                console.log(data);
+                setPosts(data.posts);
+                setCount(~~(data.postsAggregate.count / POSTS_PER_PAGE));
+            } catch (error) {
+                console.log(error);
+            }
         },
     });
     const [count, setCount] = React.useState(1);
@@ -103,7 +107,6 @@ export default function ActivityFeed() {
                             value={sort}
                             label="Sort by"
                             onChange={handleChange}
-                            fullWidth
                         >
                             <MenuItem value={1}>Hot</MenuItem>
                             <MenuItem value={2}>New</MenuItem>
