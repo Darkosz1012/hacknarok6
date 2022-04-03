@@ -13,7 +13,9 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
 import SendIcon from "@mui/icons-material/Send";
 import BaseActivityFeed from "./ActivityFeed/ActivityFeed";
+import RoomIcon from '@mui/icons-material/Room';
 import MainMap from "./MainMap";
+import MapIcon from '@mui/icons-material/Map';
 import {
     Link as RouterLink,
     Route,
@@ -181,7 +183,7 @@ function DashboardContent() {
                             <ListItem>
                                 <ListItemButton component={RouterLink} to="/">
                                     <ListItemIcon>
-                                        <LogoutIcon />
+                                        <MapIcon />
                                     </ListItemIcon>
                                     <ListItemText primary="Map" />
                                 </ListItemButton>
@@ -192,7 +194,7 @@ function DashboardContent() {
                                     to="/nearby"
                                 >
                                     <ListItemIcon>
-                                        <LogoutIcon />
+                                        <RoomIcon />
                                     </ListItemIcon>
                                     <ListItemText primary="Nearby" />
                                 </ListItemButton>
