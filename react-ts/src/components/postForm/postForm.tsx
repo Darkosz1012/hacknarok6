@@ -18,6 +18,7 @@ import { useState } from "react";
 import { LatLng } from "leaflet";
 import { useQuery, gql } from "@apollo/client";
 
+
 const GET_TAGS = gql`
   query Places($where: PlaceWhere) {
     tags {
@@ -42,6 +43,7 @@ export interface PostData {
   tags: string[];
   location: LatLng;
   place?: string;
+  img?:any;
 }
 interface PostFormProps {
   onSubmit?: (data: PostData) => void;
@@ -56,6 +58,7 @@ export default function PostForm(props: PostFormProps) {
 
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
+  const [file, setFile] = useState<any>(null);
 
   const { loading, error, data } = useQuery(GET_TAGS, {
     variables: {
@@ -167,6 +170,20 @@ export default function PostForm(props: PostFormProps) {
             setContent(e.target.value);
           }}
         />
+        <Button
+          variant="contained"
+          component="label"
+        >
+          Upload File
+          <input
+            type="file"
+            hidden
+            onChange={(e) => {
+              if(e?.target?.files)
+              setFile(e?.target?.files[0]);
+            }}
+          />
+        </Button>
       </CardContent>
       <CardActions sx={{ justifyContent: "flex-end" }}>
         <Button
@@ -182,6 +199,7 @@ export default function PostForm(props: PostFormProps) {
               tags,
               location: newLocation,
               place: parsed.place ?? null,
+              img:file,
             });
           }}
         >

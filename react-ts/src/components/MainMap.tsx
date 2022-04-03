@@ -24,6 +24,7 @@ import useInterval from "use-interval";
 import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
+import axios from "axios";
 
 const GET_PLACES = gql`
   query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
@@ -54,6 +55,7 @@ const GET_PLACES = gql`
   }
 `;
 
+
 const ADD_POST_MUTATION = gql`
   mutation createPost(
     $title: String!
@@ -61,6 +63,7 @@ const ADD_POST_MUTATION = gql`
     $coords: PointInput!
     $tags: [String!]
     $place: String
+    $img:String
   ) {
     createPost(
       title: $title
@@ -68,6 +71,7 @@ const ADD_POST_MUTATION = gql`
       coords: $coords
       tags: $tags
       place: $place
+      img: $img
     ) {
       success
     }
@@ -245,6 +249,23 @@ function MainMap(props: any) {
 
   const handleAdd = (data: PostData) => {
     setOpenAdd(false);
+    console.log(data)
+    const formData = new FormData();
+    formData.append('image',data.img);
+    let name = data.img.name;
+    console.log(name)
+    formData.append('name',name);
+    const config = {
+        headers: {
+            'content-type': 'multipart/form-data'
+        },
+        
+    };
+    axios.post("/photos/upload",formData,config)
+        .then((response) => {
+            console.log("The file is successfully uploaded");
+        }).catch((error) => {
+    });
     mutateFunction({
       variables: {
         title: data.title,
@@ -255,6 +276,7 @@ function MainMap(props: any) {
         },
         tags: data.tags,
         place: data.place,
+        img: name
       },
     });
   };

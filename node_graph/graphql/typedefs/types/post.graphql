@@ -15,4 +15,16 @@ type Post{
     createdAt: DateTime! @timestamp(operations: [CREATE])
     updatedAt: DateTime! @timestamp(operations: [CREATE, UPDATE])
     coords: Point!
+    img: String
+
+    grade: Int
+    @cypher(
+      statement: """
+        MATCH (this)
+        OPTIONAL MATCH (this)-[upvote : likedBy]-(:User)
+        WITH this, COUNT(upvote) as upvotes
+        OPTIONAL MATCH (this)-[downvote : unlikedBy]-(:User)
+        RETURN upvotes - COUNT(downvote) 
+      """
+    )
 }

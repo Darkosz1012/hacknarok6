@@ -13,7 +13,9 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon/ListItemIcon";
 import SendIcon from "@mui/icons-material/Send";
 import BaseActivityFeed from "./ActivityFeed/ActivityFeed";
+import RoomIcon from '@mui/icons-material/Room';
 import MainMap from "./MainMap";
+import MapIcon from '@mui/icons-material/Map';
 import {
   Link as RouterLink,
   Route,
@@ -181,30 +183,33 @@ function DashboardContent() {
             </Toolbar>
             <Divider />
             <List component="nav">
-              <ListItem>
-                <ListItemButton component={RouterLink} to="/">
-                  <ListItemIcon>
-                    <LogoutIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Map" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem>
-                <ListItemButton component={RouterLink} to="/nearby">
-                  <ListItemIcon>
-                    <LogoutIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Nearby" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem>
-                <ListItemButton onClick={signOut}>
-                  <ListItemIcon>
-                    <LogoutIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Logout" />
-                </ListItemButton>
-              </ListItem>
+                <ListItem>
+                    <ListItemButton component={RouterLink} to="/">
+                        <ListItemIcon>
+                            <MapIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Map" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem>
+                    <ListItemButton
+                        component={RouterLink}
+                        to="/nearby"
+                    >
+                        <ListItemIcon>
+                            <RoomIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Nearby" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem>
+                    <ListItemButton onClick={signOut}>
+                        <ListItemIcon>
+                            <LogoutIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Logout" />
+                    </ListItemButton>
+                </ListItem>
             </List>
           </Drawer>
           <Box

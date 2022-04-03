@@ -22,10 +22,13 @@
     "@neo4j/graphql-ogm": "^3.0.3",
     "@neo4j/graphql-plugin-auth": "^1.0.0",
     "apollo-server": "^3.6.7",
+    "apollo-server-express": "^3.6.7",
     "dotenv": "^16.0.0",
+    "express": "^4.17.3",
     "fs": "^0.0.1-security",
     "graphql": "^16.3.0",
     "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.4",
     "neo4j-driver": "^4.4.5",
     "path": "^0.12.7"
   },
