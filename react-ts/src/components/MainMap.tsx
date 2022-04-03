@@ -24,6 +24,7 @@ import useInterval from "use-interval";
 import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
+import calcDistance from "../util/distance";
 
 const ADD_POST_MUTATION = gql`
   mutation createPost(
@@ -124,8 +125,6 @@ function UserMarker(props: any) {
 
   useEffect(() => {
     if (props.hasCentered || !props.position) return;
-
-    console.log(props.hasCentered);
 
     map.flyTo(props.position, 13);
 
@@ -229,7 +228,10 @@ function MainMap(props: any) {
       <AddButton position={position} onAdd={onAdd}></AddButton>
       {!error && (
         <>
-          {placeQueryData?.places.map((marker: any, index: number) => {
+          {placeQueryData?.places.filter(marker => {
+            if (!position?.lat || !position?.lng) return false;
+            return calcDistance(marker.coords.latitude, marker.coords.longitude, position.lat ?? 0, position?.lng ??0)*1000 <= distanceRange
+          }).map((marker: any, index: number) => {
             return (
               <PostMarker
                 key={index}
@@ -241,7 +243,10 @@ function MainMap(props: any) {
               />
             );
           })}
-          {placeQueryData?.posts.map((marker: any, index: number) => {
+          {placeQueryData?.posts.filter(marker => {
+            if (!position?.lat || !position?.lng) return false;
+            return calcDistance(marker.coords.latitude, marker.coords.longitude, position.lat ?? 0, position?.lng ??0)*1000 <= distanceRange
+          }).map((marker: any, index: number) => {
             return (
               <PostMarker
                 key={index}

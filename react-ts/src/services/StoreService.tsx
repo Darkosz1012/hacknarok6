@@ -25,7 +25,7 @@ interface IPlaceQueryData {
     name: string,
     coords: {
       longitude: number,
-      lattitude: number,
+      latitude: number,
     }
   }[],
   posts: {
@@ -38,7 +38,7 @@ interface IPlaceQueryData {
     createdAt: string,
     coords: {
       longitude: number,
-      lattitude: number,
+      latitude: number,
     },
     tags: {
       name: string,
