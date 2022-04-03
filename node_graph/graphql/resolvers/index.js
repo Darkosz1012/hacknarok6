@@ -79,20 +79,19 @@ export default function (ogm, driver) {
         var data = jwt.decode(refreshToken);
         return createUserTokenWithoutRefresh(data, refreshToken);
       },
-      createPost: async (
-        _source,
-        { title, content, coords, tags, place },
-        context
-      ) => {
-        var input = {
+      createPost: async (_source, { title, content, coords, tags, place,img }, context) => {
+        var input =  {
           title,
           content,
           coords,
           createdBy: {
             connect: { where: { node: { userId: context.jwt.sub } } },
           },
-        };
-        if (place) {
+        }
+        if(img){
+          input.img = img
+        }
+        if(place){
           input.place = {
             connect: {
               where: {

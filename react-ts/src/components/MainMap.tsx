@@ -2,7 +2,7 @@ import { Icon, LatLng, Point } from "leaflet";
 import * as React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
+import { Circle, MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -15,12 +15,46 @@ import {
   AppBar,
   Dialog,
   IconButton,
-  Toolbar,
   Slide,
+  Toolbar,
 } from "@mui/material";
+import { PostMarker } from "./postMarker/postMarker";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import useInterval from "use-interval";
 import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
-import { useMutation, gql } from "@apollo/client";
+import { useStore } from "../services/StoreService";
+import axios from "axios";
+
+const GET_PLACES = gql`
+  query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
+    places(where: $where, options: $options) {
+      name
+      coords {
+        longitude
+        latitude
+      }
+    }
+
+    posts(where: $where2) {
+      title
+      content
+      createdBy {
+        username
+        userId
+      }
+      createdAt
+      coords {
+        longitude
+        latitude
+      }
+      tags {
+        name
+      }
+    }
+  }
+`;
+
 
 const ADD_POST_MUTATION = gql`
   mutation createPost(
@@ -29,6 +63,7 @@ const ADD_POST_MUTATION = gql`
     $coords: PointInput!
     $tags: [String!]
     $place: String
+    $img:String
   ) {
     createPost(
       title: $title
@@ -36,6 +71,7 @@ const ADD_POST_MUTATION = gql`
       coords: $coords
       tags: $tags
       place: $place
+      img: $img
     ) {
       success
     }
@@ -59,44 +95,86 @@ function AddButton(props: any) {
 
   return (
     <Box>
-    <Box sx={{ position: 'absolute', bottom: '3rem', right: '3rem', display:'flex', flexDirection:'column-reverse', justifyContent: 'space-between', height:'17rem'}}>
-      <Fab sx={{ width: '5rem', height: '5rem' }} color={active ? 'error' : 'primary'} onClick={(e => {
-        e.stopPropagation();
-        setActive(!active);
-      })}>
-        {!active && <AddIcon sx={{width:'50%', height:'50%'}}></AddIcon>}
-        {active && <CloseIcon sx={{width:'50%', height:'50%'}}></CloseIcon>}
-      </Fab>
-      {active && <Fab sx={{ width: '5rem', height: '5rem' }} color={'success'} onClick={(e => handleAdd(map.getCenter()))}>
-        <CheckIcon sx={{width:'50%', height:'50%'}}></CheckIcon>
-      </Fab>}
-        {active && <Fab sx={{ width: '5rem', height: '5rem' }} onClick={(e => handleMoveToUser())}>
-        <GpsFixedIcon sx={{width:'50%', height:'50%'}}></GpsFixedIcon>
-      </Fab>}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "3rem",
+          right: "3rem",
+          display: "flex",
+          flexDirection: "column-reverse",
+          justifyContent: "space-between",
+          height: "17rem",
+        }}
+      >
+        <Fab
+          sx={{ width: "5rem", height: "5rem" }}
+          color={active ? "error" : "primary"}
+          onClick={(e) => {
+            e.stopPropagation();
+            setActive(!active);
+          }}
+        >
+          {!active && <AddIcon sx={{ width: "50%", height: "50%" }}></AddIcon>}
+          {active && (
+            <CloseIcon sx={{ width: "50%", height: "50%" }}></CloseIcon>
+          )}
+        </Fab>
+        {active && (
+          <Fab
+            sx={{ width: "5rem", height: "5rem" }}
+            color={"success"}
+            onClick={(e) => handleAdd(map.getCenter())}
+          >
+            <CheckIcon sx={{ width: "50%", height: "50%" }}></CheckIcon>
+          </Fab>
+        )}
+        {active && (
+          <Fab
+            sx={{ width: "5rem", height: "5rem" }}
+            onClick={(e) => handleMoveToUser()}
+          >
+            <GpsFixedIcon sx={{ width: "50%", height: "50%" }}></GpsFixedIcon>
+          </Fab>
+        )}
       </Box>
-      {active && <PushPinTwoToneIcon sx={{ position: 'absolute', top: '50%', left: '50%', zIndex:'1000'}}></PushPinTwoToneIcon>}
+      {active && (
+        <PushPinTwoToneIcon
+          sx={{ position: "absolute", top: "50%", left: "50%", zIndex: "1000" }}
+        ></PushPinTwoToneIcon>
+      )}
     </Box>
   );
 }
 
 function UserMarker(props: any) {
-    const userIcon = new Icon({
-        iconUrl: pinIcon,
-        iconSize: new Point(40, 40),  
-      });
+  const { distanceRange } = useStore();
+  const userIcon = new Icon({
+    iconUrl: pinIcon,
+    iconSize: new Point(40, 40),
+  });
 
-    const map = useMap();
+  const map = useMap();
 
-    useEffect(() => {
-      map.locate().on("locationfound", function (e) {
-        props.setPosition(e.latlng);
-        map.flyTo(e.latlng, 15);
-      });
-    }, [map]);
+  useEffect(() => {
+    if (props.hasCentered || !props.position) return;
 
-    return !props.position ? null :(
-        <Marker position={props.position} icon={userIcon}></Marker>
-    );
+    console.log(props.hasCentered);
+
+    map.flyTo(props.position, 13);
+
+    props.setHasCentered(true);
+  }, [props.position]);
+
+  return !props.position ? null : (
+    <>
+      <Circle
+        center={props.position}
+        pathOptions={{ fillOpacity: 0.1 }}
+        radius={distanceRange}
+      />
+      <Marker position={props.position} icon={userIcon}></Marker>
+    </>
+  );
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -109,7 +187,47 @@ const Transition = React.forwardRef(function Transition(
 });
 
 function MainMap(props: any) {
+  const { distanceRange } = useStore();
+
   const [position, setPosition] = useState<LatLng | undefined>();
+  const [hasCentered, setHasCentered] = useState(false);
+
+  useInterval(() => {
+    navigator.geolocation.getCurrentPosition((location) => {
+      setPosition(
+        new LatLng(location.coords.latitude, location.coords.longitude)
+      );
+    });
+  }, 1000);
+
+  const {
+    loading,
+    error,
+    data: placeData,
+  } = useQuery(GET_PLACES, {
+    variables: {
+      where: {
+        coords_LTE: {
+          point: {
+            longitude: position?.lng,
+            latitude: position?.lat,
+          },
+          distance: distanceRange,
+        },
+      },
+      where2: {
+        coords_LTE: {
+          point: {
+            longitude: position?.lng,
+            latitude: position?.lat,
+          },
+          distance: distanceRange,
+        },
+      },
+    },
+    pollInterval: 2000,
+  });
+
   const [addLocation, setAddLocation] = useState<LatLng | undefined>();
 
   const [openAdd, setOpenAdd] = useState(false);
@@ -131,6 +249,23 @@ function MainMap(props: any) {
 
   const handleAdd = (data: PostData) => {
     setOpenAdd(false);
+    console.log(data)
+    const formData = new FormData();
+    formData.append('image',data.img);
+    let name = data.img.name;
+    console.log(name)
+    formData.append('name',name);
+    const config = {
+        headers: {
+            'content-type': 'multipart/form-data'
+        },
+        
+    };
+    axios.post("/photos/upload",formData,config)
+        .then((response) => {
+            console.log("The file is successfully uploaded");
+        }).catch((error) => {
+    });
     mutateFunction({
       variables: {
         title: data.title,
@@ -141,6 +276,7 @@ function MainMap(props: any) {
         },
         tags: data.tags,
         place: data.place,
+        img: name
       },
     });
   };
@@ -155,8 +291,41 @@ function MainMap(props: any) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <UserMarker position={position} setPosition={setPosition} />
+      <UserMarker
+        position={position}
+        setPosition={setPosition}
+        hasCentered={hasCentered}
+        setHasCentered={setHasCentered}
+      />
       <AddButton position={position} onAdd={onAdd}></AddButton>
+      {!loading && !error && (
+        <>
+          {placeData.places.map((marker: any, index: number) => {
+            return (
+              <PostMarker
+                key={index}
+                position={
+                  new LatLng(marker.coords.latitude, marker.coords.longitude)
+                }
+                children={<h1>{marker.name}</h1>}
+                type={"home"}
+              />
+            );
+          })}
+          {placeData.posts.map((marker: any, index: number) => {
+            return (
+              <PostMarker
+                key={index}
+                position={
+                  new LatLng(marker.coords.latitude, marker.coords.longitude)
+                }
+                children={<h1>{marker.name}</h1>}
+                type={"pin"}
+              />
+            );
+          })}
+        </>
+      )}
 
       <Dialog
         fullScreen
@@ -183,9 +352,6 @@ function MainMap(props: any) {
         <PostForm
           currentLocation={addLocation}
           sx={{ width: "100%", maxWidth: "600px", margin: " 20px auto" }}
-          locations={[
-            { name: "zabka", position: new LatLng(52.1064618, 18.5525723) },
-          ]}
           onSubmit={handleAdd}
         />
       </Dialog>
