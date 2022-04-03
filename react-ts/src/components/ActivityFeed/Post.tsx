@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, CardMedia, Grid } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -36,6 +36,7 @@ export default function Post({
     iLike,
     iUnlike,
     grade,
+    img,
     ...props
 }: PostProps) {
     // const auth = useAuthUser();
@@ -168,6 +169,13 @@ export default function Post({
                         title={createdBy.username}
                         subheader={createdAt}
                     />
+                    {img && (
+                        <CardMedia
+                            component="img"
+                            height="194"
+                            image={`http://localhost:3000/uploads/${img}`}
+                        />
+                    )}
                     <CardContent
                         sx={{
                             display: "flex",

@@ -17,11 +17,43 @@ type postsProps = {
     posts: PostType[];
 };
 
-export default function ActivityFeed() {
+interface ActivityFeedProps {
+    placeId?: string;
+}
+
+const GET_TAGS = gql`
+    query Tags {
+        tags {
+            name
+        }
+    }
+`;
+
+export default function ActivityFeed(props: ActivityFeedProps) {
     const POSTS_PER_PAGE = 4;
     const [page, setPage] = React.useState(1);
     const [tags, setTags] = React.useState<string[]>([]);
     const [posts, setPosts] = React.useState<any[]>([]);
+    const whereOptions = {
+        tags_SOME: {
+            ...(tags.length
+                ? {
+                      name_IN: tags,
+                  }
+                : { name_NOT_IN: tags }),
+        },
+
+        ...tags.reduce((acc, curr) => {
+            return {
+                OR: [
+                    {
+                        title_CONTAINS: curr,
+                        OR: [acc],
+                    },
+                ],
+            };
+        }, {}),
+    };
     const { loading, error } = useQuery(GET_POSTS_QUERY, {
         variables: {
             options: {
@@ -41,6 +73,9 @@ export default function ActivityFeed() {
                           }
                         : { name_NOT_IN: tags }),
                 },
+                ...(props.placeId
+                    ? { place: { placeId: props.placeId } }
+                    : { ...whereOptions }),
                 coords_LTE: {
                     distance: 2000,
                     point: {
@@ -61,7 +96,9 @@ export default function ActivityFeed() {
             }
         },
     });
-    const [count, setCount] = React.useState(1);
+
+    const { data: dataTags } = useQuery(GET_TAGS);
+    const [count, setCount] = React.useState(10);
     const [sort, setSort] = React.useState("1");
 
     const handleChange = (event: SelectChangeEvent) =>
@@ -84,7 +121,6 @@ export default function ActivityFeed() {
         setTags(value ?? []);
         setPage(1);
     };
-
     const handleTagClick = (tag: string) => toggleTag(tag);
 
     return (

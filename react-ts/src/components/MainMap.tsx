@@ -17,6 +17,7 @@ import {
   IconButton,
   Slide,
   Toolbar,
+  Button,
 } from "@mui/material";
 import { PostMarker } from "./postMarker/postMarker";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -25,15 +26,19 @@ import { TransitionProps } from "@mui/material/transitions";
 import PostForm, { PostData } from "./postForm/postForm";
 import { useStore } from "../services/StoreService";
 import axios from "axios";
+import PlaceCard from "./placeCard/PlaceCard";
+import ActivityFeed from "./ActivityFeed/ActivityFeed";
 
 const GET_PLACES = gql`
   query Places($where: PlaceWhere, $where2: PostWhere, $options: PlaceOptions) {
     places(where: $where, options: $options) {
+      placeId
       name
       coords {
         longitude
         latitude
       }
+      countPosts
     }
 
     posts(where: $where2) {
@@ -55,7 +60,6 @@ const GET_PLACES = gql`
   }
 `;
 
-
 const ADD_POST_MUTATION = gql`
   mutation createPost(
     $title: String!
@@ -63,7 +67,7 @@ const ADD_POST_MUTATION = gql`
     $coords: PointInput!
     $tags: [String!]
     $place: String
-    $img:String
+    $img: String
   ) {
     createPost(
       title: $title
@@ -216,6 +220,7 @@ function MainMap(props: any) {
         },
       },
       where2: {
+        place: null,
         coords_LTE: {
           point: {
             longitude: position?.lng,
@@ -230,11 +235,16 @@ function MainMap(props: any) {
 
   const [addLocation, setAddLocation] = useState<LatLng | undefined>();
 
-  const [openAdd, setOpenAdd] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMode, setDialogMode] = useState("Add");
+  const [placeId, setPlaceId] = useState("");
+  const [placeLoc, setPlaceLoc] = useState<any>();
 
   const onAdd = (location: LatLng) => {
+    setDialogMode("Add");
     setAddLocation(location);
-    setOpenAdd(true);
+    setPlaceLoc(undefined);
+    setOpenDialog(true);
   };
 
   const [mutateFunction] = useMutation(ADD_POST_MUTATION, {
@@ -248,24 +258,26 @@ function MainMap(props: any) {
   });
 
   const handleAdd = (data: PostData) => {
-    setOpenAdd(false);
-    console.log(data)
+    console.log(data);
     const formData = new FormData();
-    formData.append('image',data.img);
-    let name = data.img.name;
-    console.log(name)
-    formData.append('name',name);
-    const config = {
+    let name = data?.img?.name;
+    if (data.img) {
+      formData.append("image", data.img);
+      console.log(name);
+      formData.append("name", name);
+      const config = {
         headers: {
-            'content-type': 'multipart/form-data'
+          "content-type": "multipart/form-data",
         },
-        
-    };
-    axios.post("/photos/upload",formData,config)
+      };
+      axios
+        .post("/photos/upload", formData, config)
         .then((response) => {
-            console.log("The file is successfully uploaded");
-        }).catch((error) => {
-    });
+          console.log("The file is successfully uploaded");
+        })
+        .catch((error) => {});
+    }
+    setOpenDialog(false);
     mutateFunction({
       variables: {
         title: data.title,
@@ -276,7 +288,7 @@ function MainMap(props: any) {
         },
         tags: data.tags,
         place: data.place,
-        img: name
+        ...(name ? { img: name } : {}),
       },
     });
   };
@@ -307,7 +319,21 @@ function MainMap(props: any) {
                 position={
                   new LatLng(marker.coords.latitude, marker.coords.longitude)
                 }
-                children={<h1>{marker.name}</h1>}
+                children={
+                  <PlaceCard
+                    place={marker}
+                    onShow={() => {
+                      setDialogMode("Posts");
+                      setPlaceId(marker.placeId);
+                      setPlaceLoc({
+                        lng: marker.coords.longitude,
+                        lat: marker.coords.latitude,
+                        place: marker.placeId,
+                      });
+                      setOpenDialog(true);
+                    }}
+                  ></PlaceCard>
+                }
                 type={"home"}
               />
             );
@@ -329,9 +355,9 @@ function MainMap(props: any) {
 
       <Dialog
         fullScreen
-        open={openAdd}
+        open={openDialog}
         onClose={() => {
-          setOpenAdd(false);
+          setOpenDialog(false);
         }}
         TransitionComponent={Transition}
       >
@@ -342,18 +368,38 @@ function MainMap(props: any) {
               color="inherit"
               aria-label="close"
               onClick={() => {
-                setOpenAdd(false);
+                setOpenDialog(false);
               }}
             >
               <CloseIcon />
             </IconButton>
+            {dialogMode === "Posts" && (
+              <Button
+                sx={{ marginLeft: "auto" }}
+                autoFocus
+                color="inherit"
+                onClick={() => {
+                  setDialogMode("Add");
+                }}
+              >
+                Add new post
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
-        <PostForm
-          currentLocation={addLocation}
-          sx={{ width: "100%", maxWidth: "600px", margin: " 20px auto" }}
-          onSubmit={handleAdd}
-        />
+        {dialogMode === "Add" && (
+          <PostForm
+            currentLocation={addLocation ?? position}
+            sx={{ width: "100%", maxWidth: "600px", margin: " 20px auto" }}
+            onSubmit={handleAdd}
+            place={placeLoc}
+          />
+        )}
+        {dialogMode === "Posts" && (
+          <>
+            <ActivityFeed placeId={placeId}></ActivityFeed>
+          </>
+        )}
       </Dialog>
     </MapContainer>
   );
