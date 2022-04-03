@@ -154,7 +154,7 @@ const Transition = React.forwardRef(function Transition(
 });
 
 function MainMap(props: any) {
-  const { distanceRange, position, setPosition, placeQueryResult } = useStore();
+  const { distanceRange, position, setPosition, placeQueryResult, placeQueryData } = useStore();
 
   const [hasCentered, setHasCentered] = useState(false);
 
@@ -173,7 +173,6 @@ function MainMap(props: any) {
   const {
     loading,
     error,
-    data: placeData,
   } = placeQueryResult;
 
   const [addLocation, setAddLocation] = useState<LatLng | undefined>();
@@ -230,7 +229,7 @@ function MainMap(props: any) {
       <AddButton position={position} onAdd={onAdd}></AddButton>
       {!error && (
         <>
-          {placeData?.places.map((marker: any, index: number) => {
+          {placeQueryData?.places.map((marker: any, index: number) => {
             return (
               <PostMarker
                 key={index}
@@ -242,7 +241,7 @@ function MainMap(props: any) {
               />
             );
           })}
-          {placeData?.posts.map((marker: any, index: number) => {
+          {placeQueryData?.posts.map((marker: any, index: number) => {
             return (
               <PostMarker
                 key={index}

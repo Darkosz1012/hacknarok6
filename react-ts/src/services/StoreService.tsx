@@ -1,6 +1,6 @@
 import { ApolloError, gql, useQuery, ApolloQueryResult } from "@apollo/client";
 import { LatLng } from "leaflet";
-import React, { ReactNode,  useState } from "react";
+import React, { ReactNode,  useEffect,  useState } from "react";
 import { createGenericContext } from "./GenericContext";
 export interface StoreProps {
   children: ReactNode;
@@ -14,33 +14,36 @@ export interface IStore {
   placeQueryResult: {
     loading: boolean,
     error?: ApolloError | undefined,
-    data: {
-      places: {
-        name: string,
-        coords: {
-          longitude: number,
-          lattitude: number,
-        }
-      }[],
-      posts: {
-        title: string,
-        content: string,
-        createdBy: {
-          username: string,
-          userId: string,
-        },
-        createdAt: string,
-        coords: {
-          longitude: number,
-          lattitude: number,
-        },
-        tags: {
-          name: string,
-        }[]
-      }[]
-    },
+    data: IPlaceQueryData,  
     refetch: (variables?: Partial<any>) => Promise<any>
-  }
+  },
+  placeQueryData: IPlaceQueryData,
+}
+
+interface IPlaceQueryData {
+  places: {
+    name: string,
+    coords: {
+      longitude: number,
+      lattitude: number,
+    }
+  }[],
+  posts: {
+    title: string,
+    content: string,
+    createdBy: {
+      username: string,
+      userId: string,
+    },
+    createdAt: string,
+    coords: {
+      longitude: number,
+      lattitude: number,
+    },
+    tags: {
+      name: string,
+    }[]
+  }[]
 }
 
 const GET_PLACES = gql`
@@ -102,12 +105,20 @@ const Store = (props: StoreProps) => {
     pollInterval: 2000,
   });
 
+  const [placeQueryData, setPlaceQueryData] = useState<IPlaceQueryData>(placeQueryResult.data);
+
+  useEffect(() => {
+    if (placeQueryResult.loading) return;
+    setPlaceQueryData(placeQueryResult.data);
+  }, [placeQueryResult.loading])
+
   const value: IStore = {
     distanceRange,
     setDistanceRange,
     position,
     setPosition,
     placeQueryResult,
+    placeQueryData,
   };
 
   return (
