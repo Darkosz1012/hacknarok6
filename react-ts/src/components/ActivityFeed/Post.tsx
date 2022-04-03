@@ -22,6 +22,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useMutation, useQuery } from "@apollo/client";
 import { Update } from "@mui/icons-material";
 import { UPDATE_POST_LIKE } from "../../queries/posts";
+import { useAuthUser } from "react-auth-kit";
 
 interface PostProps extends PostType {
     onChipClick?: (tag: string) => void;
@@ -34,9 +35,16 @@ export default function Post({
     createdBy,
     iLike,
     iUnlike,
-    likedByAggregate,
+    grade,
     ...props
 }: PostProps) {
+    // const auth = useAuthUser();
+    // let userId;
+    // React.useEffect(() => {
+    //     if (auth) {
+    //         console.log(auth());
+    //     }
+    // }, [auth]);
     const [rating, setRating] = React.useState(0);
     const [myRating, setMyRating] = React.useState<[boolean, boolean]>([
         iLike,
@@ -51,7 +59,7 @@ export default function Post({
                             {
                                 where: {
                                     node: {
-                                        userId: 2,
+                                        username: "Test",
                                     },
                                 },
                             },
@@ -70,7 +78,7 @@ export default function Post({
                             {
                                 where: {
                                     node: {
-                                        userId: 2,
+                                        username: "test",
                                     },
                                 },
                             },
@@ -89,6 +97,12 @@ export default function Post({
                 ? [false, true]
                 : [false, false]
         );
+        if (rating === "liked") {
+            likeFunction();
+        }
+        if (rating === "disliked") {
+            dislikeFunction();
+        }
     };
     const RatingBootonGroup = styled(ToggleButtonGroup)(() => ({
         "&": {
@@ -134,7 +148,7 @@ export default function Post({
                             textAlign: "center",
                         }}
                     >
-                        {likedByAggregate.count}
+                        {grade}
                     </Typography>
                     <ToggleButton value="disliked" aria-label="module">
                         <ArrowDropDownIcon

@@ -20,9 +20,7 @@ export const GET_POSTS_QUERY = gql`
             tags {
                 name
             }
-            likedByAggregate {
-                count
-            }
+            grade
             iLike
             iUnlike
         }
@@ -34,11 +32,6 @@ export const UPDATE_POST_LIKE = gql`
         updatePosts(update: $update) {
             info {
                 relationshipsCreated
-            }
-            posts {
-                likedByAggregate {
-                    count
-                }
             }
         }
     }
