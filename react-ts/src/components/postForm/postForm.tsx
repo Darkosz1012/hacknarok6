@@ -32,6 +32,7 @@ const GET_TAGS = gql`
         latitude
       }
     }
+    
   }
 `;
 
@@ -44,7 +45,6 @@ export interface PostData {
 }
 interface PostFormProps {
   onSubmit?: (data: PostData) => void;
-  locations?: { name: string; position: LatLng }[];
   currentLocation?: LatLng;
   sx?: SxProps<Theme>;
 }

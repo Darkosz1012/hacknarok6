@@ -12,9 +12,11 @@ import SearchBarTags from "../searchBarTags/SearchBarTags";
 import { PostType } from "../../types/PostType";
 import { useQuery, gql } from "@apollo/client";
 import { GET_POSTS_QUERY } from "../../queries/posts";
+
 type postsProps = {
     posts: PostType[];
 };
+
 export default function ActivityFeed() {
     const POSTS_PER_PAGE = 1;
     const [page, setPage] = React.useState(1);
