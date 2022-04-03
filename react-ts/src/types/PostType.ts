@@ -14,4 +14,7 @@ export type PostType = {
     tags: {
         name: string;
     }[];
+    grade: number;
+    iLike: boolean;
+    iUnlike: boolean;
 };

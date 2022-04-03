@@ -20,6 +20,19 @@ export const GET_POSTS_QUERY = gql`
             tags {
                 name
             }
+            grade
+            iLike
+            iUnlike
+        }
+    }
+`;
+
+export const UPDATE_POST_LIKE = gql`
+    mutation Mutation($update: PostUpdateInput) {
+        updatePosts(update: $update) {
+            info {
+                relationshipsCreated
+            }
         }
     }
 `;
